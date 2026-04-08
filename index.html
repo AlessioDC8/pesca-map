@@ -30,21 +30,30 @@
         }
         .weather-header {
             background: linear-gradient(90deg, #00b894, #00cec9);
-            color: #0a0a0f; padding: 12px 15px; border-radius: 12px 12px 0 0;
+            color: #0a0a0f; padding: 8px 10px; border-radius: 12px 12px 0 0;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .weather-header h2 { font-size: 13px; margin-bottom: 2px; font-weight: 600; }
-        .weather-header p { font-size: 10px; opacity: 0.8; }
+        .weather-header-content { flex: 1; }
+        .weather-header h2 { font-size: 11px; margin: 0; font-weight: 600; }
+        .weather-header p { font-size: 9px; opacity: 0.8; margin: 2px 0 0 0; }
+        .close-btn {
+            background: rgba(0,0,0,0.2); border: none; color: #0a0a0f;
+            width: 24px; height: 24px; border-radius: 50%;
+            cursor: pointer; font-size: 14px; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .close-btn:hover { background: rgba(0,0,0,0.3); }
         
-        .weather-content { padding: 12px; }
+        .weather-content { padding: 8px; }
         
         /* Loading State */
         .weather-loading {
-            text-align: center; padding: 30px;
-            color: #666; font-size: 12px;
+            text-align: center; padding: 20px;
+            color: #666; font-size: 11px;
         }
         .weather-loading::after {
-            content: ''; display: block; width: 30px; height: 30px;
-            margin: 15px auto; border: 3px solid #333;
+            content: ''; display: block; width: 24px; height: 24px;
+            margin: 10px auto; border: 3px solid #333;
             border-top-color: #00b894; border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -184,12 +193,20 @@
             border-top: 1px solid #333;
         }
         
-        /* Toggle Button */
+        /* Toggle Buttons for Mobile */
         .weather-toggle {
             position: fixed; top: 10px; left: 10px; z-index: 1001;
             background: linear-gradient(90deg, #00b894, #00cec9);
-            color: #0a0a0f; border: none; padding: 8px 12px;
-            border-radius: 20px; cursor: pointer; font-weight: 600;
+            color: #0a0a0f; border: none; padding: 10px 14px;
+            border-radius: 25px; cursor: pointer; font-weight: 600;
+            font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: none;
+        }
+        .sidebar-toggle {
+            position: fixed; top: 10px; right: 10px; z-index: 1001;
+            background: linear-gradient(135deg, #1F4E79, #2E86AB);
+            color: white; border: none; padding: 10px 14px;
+            border-radius: 25px; cursor: pointer; font-weight: 600;
             font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             display: none;
         }
@@ -199,18 +216,26 @@
            ============================================ */
         .sidebar {
             position: fixed; top: 10px; right: 10px;
-            width: 320px; max-height: calc(100vh - 20px);
+            width: 300px; max-height: calc(100vh - 20px);
             background: white; border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;
-            overflow-y: auto; font-size: 12px;
+            overflow-y: auto; font-size: 11px;
         }
         .sidebar-header {
             background: linear-gradient(135deg, #1F4E79, #2E86AB);
-            color: white; padding: 15px; border-radius: 12px 12px 0 0;
+            color: white; padding: 8px 10px; border-radius: 12px 12px 0 0;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .sidebar-header h1 { font-size: 14px; margin-bottom: 5px; }
-        .sidebar-header p { opacity: 0.8; font-size: 10px; }
-        .sidebar-content { padding: 12px; }
+        .sidebar-header h1 { font-size: 12px; margin: 0; }
+        .sidebar-header p { opacity: 0.8; font-size: 9px; margin: 0; }
+        .sidebar-close {
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 24px; height: 24px; border-radius: 50%;
+            cursor: pointer; font-size: 14px; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sidebar-close:hover { background: rgba(255,255,255,0.3); }
+        .sidebar-content { padding: 10px; }
         
         .counter {
             background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
@@ -304,16 +329,41 @@
         
         /* Mobile Responsive */
         @media (max-width: 1024px) {
-            .weather-panel { width: 260px; }
+            .weather-panel { width: 250px; }
+            .sidebar { width: 290px; }
         }
         @media (max-width: 768px) {
-            .weather-panel { 
-                width: calc(100% - 20px); max-height: 40vh; 
-                top: auto; bottom: 10px; left: 10px;
+            /* Pannelli nascosti di default su mobile */
+            .weather-panel, .sidebar { 
+                display: none;
+                width: calc(100% - 16px);
+                max-height: 45vh;
+                top: auto; bottom: 10px; left: 8px; right: 8px;
             }
-            .sidebar { width: calc(100% - 20px); max-height: 35vh; top: auto; bottom: 50%; }
-            .weather-toggle { display: block; }
-            .scale-bar { bottom: auto; top: 10px; }
+            .weather-panel.visible, .sidebar.visible { display: block; }
+            
+            /* Bottoni toggle sempre visibili */
+            .weather-toggle { display: flex !important; align-items: center; gap: 6px; }
+            .sidebar-toggle { 
+                position: fixed; top: 10px; right: 10px; z-index: 1001;
+                background: linear-gradient(135deg, #1F4E79, #2E86AB);
+                color: white; border: none; padding: 8px 12px;
+                border-radius: 20px; cursor: pointer; font-weight: 600;
+                font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            }
+            
+            /* Scala ridotta */
+            .scale-bar { display: none; }
+            
+            /* Popup più grandi per touch */
+            .spot-popup { min-width: 260px; }
+            .leaflet-popup-content { font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            .gauge-card { padding: 8px 4px; }
+            .gauge-value { font-size: 18px; }
+            .gauge-icon { font-size: 16px; }
+            .forecast-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
         }
     </style>
 </head>
@@ -321,25 +371,29 @@
     <!-- GRAFANA-STYLE WEATHER PANEL (LEFT) -->
     <div class="weather-panel" id="weatherPanel">
         <div class="weather-header">
-            <h2>🌊 Meteo Mare Toscano</h2>
-            <p>Porto Cala de' Medici • <span id="lastUpdate">Caricamento...</span></p>
+            <div class="weather-header-content">
+                <h2>🌊 Meteo Mare</h2>
+                <p>Porto Cala de' Medici • <span id="lastUpdate">...</span></p>
+            </div>
+            <button class="close-btn" onclick="hideWeather()">×</button>
         </div>
         <div class="weather-content" id="weatherContent">
-            <div class="weather-loading">Caricamento dati meteo...</div>
-        </div>
-        <div class="weather-footer">
-            Dati: Open-Meteo API • Aggiornamento: ogni 15 min
+            <div class="weather-loading">Caricamento...</div>
         </div>
     </div>
     
     <button class="weather-toggle" onclick="toggleWeather()">🌊 Meteo</button>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">🗺️ Spot</button>
     
     <div id="map"></div>
     
-    <div class="sidebar">
+    <div class="sidebar" id="sidebarPanel">
         <div class="sidebar-header">
-            <h1>🎣 Mappa Pesca Vada</h1>
-            <p>35 spot verificati • Costa Toscana</p>
+            <div>
+                <h1>🎣 Spot Pesca</h1>
+                <p id="spotCounterMobile">35 spot</p>
+            </div>
+            <button class="sidebar-close" onclick="hideSidebar()">×</button>
         </div>
         
         <div class="sidebar-content">
@@ -716,7 +770,40 @@
     
     function toggleWeather() {
         const panel = document.getElementById('weatherPanel');
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        const sidebar = document.getElementById('sidebarPanel');
+        // Hide sidebar when showing weather
+        if (!panel.classList.contains('visible') && sidebar) {
+            sidebar.classList.remove('visible');
+        }
+        panel.classList.toggle('visible');
+    }
+    
+    function hideWeather() {
+        const panel = document.getElementById('weatherPanel');
+        panel.classList.remove('visible');
+    }
+    
+    function toggleSidebar() {
+        const panel = document.getElementById('sidebarPanel');
+        const weather = document.getElementById('weatherPanel');
+        // Hide weather when showing sidebar
+        if (!panel.classList.contains('visible') && weather) {
+            weather.classList.remove('visible');
+        }
+        panel.classList.toggle('visible');
+    }
+    
+    function hideSidebar() {
+        const panel = document.getElementById('sidebarPanel');
+        panel.classList.remove('visible');
+    }
+    
+    // Check if mobile on load
+    function checkMobile() {
+        if (window.innerWidth <= 768) {
+            document.querySelector('.weather-toggle').style.display = 'flex';
+            document.querySelector('.sidebar-toggle').style.display = 'flex';
+        }
     }
     
     // ============================================================
@@ -946,7 +1033,10 @@
     
     function updateCounter() {
         const visible = markers.filter(m => m.options.opacity === 1).length;
-        document.getElementById('spotCounter').textContent = `${visible}/${SPOTS.length}`;
+        const counter = document.getElementById('spotCounter');
+        const mobileCounter = document.getElementById('spotCounterMobile');
+        if (counter) counter.textContent = `${visible}/${SPOTS.length}`;
+        if (mobileCounter) mobileCounter.textContent = `${visible}/${SPOTS.length} spot`;
     }
     
     function toggleFilter(btn) {
@@ -1023,7 +1113,13 @@
         setTimeout(() => toast.remove(), 2500);
     }
     
-    document.addEventListener('DOMContentLoaded', initMap);
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        checkMobile();
+    });
+    
+    // Handle resize
+    window.addEventListener('resize', checkMobile);
     
     // Auto-refresh weather every 15 minutes
     setInterval(fetchWeatherData, 15 * 60 * 1000);
