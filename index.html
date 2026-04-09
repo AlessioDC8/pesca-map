@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mappa Pesca - Castiglioncello/Vada</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
@@ -15,40 +15,51 @@
         }
         #map { height: 100vh; width: 100%; }
         
-        /* ============================================
-           GRAFANA-STYLE WEATHER PANEL (LEFT)
-           ============================================ */
+        /* ========== BOAT NAME BANNER ========== */
+        .boat-name {
+            position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+            z-index: 1001;
+            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            color: #00b894;
+            padding: 8px 24px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.4);
+            border: 2px solid #00b894;
+        }
+        
+        /* ========== WEATHER PANEL (LEFT) ========== */
         .weather-panel {
-            position: fixed; top: 10px; left: 10px;
-            width: 280px; max-height: calc(100vh - 20px);
+            position: fixed; top: 60px; left: 10px;
+            width: 270px;
+            max-height: calc(100vh - 80px);
             background: linear-gradient(180deg, #1e1e2e 0%, #252536 100%);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
             z-index: 1000; overflow-y: auto;
             font-size: 11px;
             border: 1px solid #333;
         }
         .weather-header {
             background: linear-gradient(90deg, #00b894, #00cec9);
-            color: #0a0a0f; padding: 8px 10px; border-radius: 12px 12px 0 0;
+            color: #0a0a0f; padding: 10px 12px;
+            border-radius: 12px 12px 0 0;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .weather-header-content { flex: 1; }
-        .weather-header h2 { font-size: 11px; margin: 0; font-weight: 600; }
+        .weather-header h2 { font-size: 12px; margin: 0; font-weight: 600; }
         .weather-header p { font-size: 9px; opacity: 0.8; margin: 2px 0 0 0; }
         .close-btn {
             background: rgba(0,0,0,0.2); border: none; color: #0a0a0f;
-            width: 24px; height: 24px; border-radius: 50%;
-            cursor: pointer; font-size: 14px; line-height: 1;
+            width: 22px; height: 22px; border-radius: 50%;
+            cursor: pointer; font-size: 14px;
             display: flex; align-items: center; justify-content: center;
         }
-        .close-btn:hover { background: rgba(0,0,0,0.3); }
+        .weather-content { padding: 10px; }
         
-        .weather-content { padding: 8px; }
-        
-        /* Loading State */
         .weather-loading {
-            text-align: center; padding: 20px;
+            text-align: center; padding: 30px;
             color: #666; font-size: 11px;
         }
         .weather-loading::after {
@@ -59,80 +70,56 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* Error State */
-        .weather-error {
-            text-align: center; padding: 20px;
-            color: #ff6b6b; background: rgba(255,107,107,0.1);
-            border-radius: 8px; margin: 10px;
-        }
-        
-        /* Current Conditions Grid */
+        /* Current Conditions */
         .current-conditions {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .gauge-card {
-            background: linear-gradient(135deg, #2d2d44 0%, #252536 100%);
-            border-radius: 8px; padding: 12px 8px;
-            text-align: center;
-            border: 1px solid #3d3d5c;
-            position: relative;
-            overflow: hidden;
+            background: #2d2d44; border-radius: 8px; padding: 10px 6px;
+            text-align: center; border: 1px solid #3d3d5c;
         }
-        .gauge-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-            background: var(--accent-color, #00b894);
-        }
-        .gauge-card.wave { --accent-color: #74b9ff; }
-        .gauge-card.wind { --accent-color: #fdcb6e; }
-        .gauge-card.temp { --accent-color: #ff7675; }
-        .gauge-card.pressure { --accent-color: #a29bfe; }
+        .gauge-card.wave { border-top: 3px solid #74b9ff; }
+        .gauge-card.wind { border-top: 3px solid #fdcb6e; }
+        .gauge-card.temp { border-top: 3px solid #ff7675; }
+        .gauge-card.pressure { border-top: 3px solid #a29bfe; }
         
-        .gauge-icon { font-size: 20px; margin-bottom: 4px; }
-        .gauge-value {
-            font-size: 22px; font-weight: 700; color: #fff;
-            line-height: 1;
-        }
-        .gauge-unit { font-size: 10px; color: #888; margin-top: 2px; }
-        .gauge-label { font-size: 9px; color: #666; text-transform: uppercase; margin-top: 4px; }
+        .gauge-icon { font-size: 18px; margin-bottom: 4px; }
+        .gauge-value { font-size: 20px; font-weight: 700; color: #fff; }
+        .gauge-unit { font-size: 9px; color: #888; }
+        .gauge-label { font-size: 8px; color: #666; text-transform: uppercase; margin-top: 4px; }
         
-        /* Wind Direction Compass */
+        /* Wind Direction */
         .wind-compass {
-            background: linear-gradient(135deg, #2d2d44 0%, #252536 100%);
-            border-radius: 8px; padding: 10px;
-            border: 1px solid #3d3d5c;
-            margin-bottom: 12px;
+            background: #2d2d44; border-radius: 8px; padding: 10px;
+            border: 1px solid #3d3d5c; margin-bottom: 10px;
         }
-        .compass-row {
-            display: flex; align-items: center; gap: 12px;
+        .wind-compass-title { font-size: 9px; color: #666; text-transform: uppercase; margin-bottom: 8px; }
+        .wind-compass-row {
+            display: flex; justify-content: space-around; text-align: center;
         }
-        .compass-circle {
-            width: 60px; height: 60px; border-radius: 50%;
-            background: #1a1a2e; border: 2px solid #3d3d5c;
-            position: relative; flex-shrink: 0;
-        }
-        .compass-arrow {
-            position: absolute; top: 50%; left: 50%;
-            width: 30px; height: 4px;
-            background: linear-gradient(90deg, #fdcb6e, #e17055);
-            transform-origin: left center;
-            transform: translateY(-50%);
-            border-radius: 2px;
-        }
-        .compass-arrow::after {
-            content: ''; position: absolute; right: -6px; top: -4px;
-            border: 6px solid transparent;
-            border-left-color: #e17055;
-        }
-        .compass-info { flex: 1; }
-        .compass-direction { font-size: 18px; font-weight: 700; color: #fdcb6e; }
-        .compass-speed { font-size: 14px; color: #fff; }
-        .compass-deg { font-size: 10px; color: #666; }
+        .wind-compass-label { font-size: 9px; color: #888; }
+        .wind-compass-dir { font-size: 20px; font-weight: 700; }
+        .wind-compass-dir.from { color: #74b9ff; }
+        .wind-compass-dir.to { color: #fdcb6e; }
+        .wind-compass-arrow { color: #555; font-size: 16px; align-self: center; }
+        .wind-compass-speed { text-align: center; margin-top: 8px; font-size: 11px; color: #888; }
         
-        /* Forecast Section */
+        /* Sky Condition */
+        .sky-card {
+            background: #2d2d44; border-radius: 8px; padding: 10px;
+            border: 1px solid #3d3d5c; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .sky-icon { font-size: 28px; }
+        .sky-info { flex: 1; }
+        .sky-desc { font-size: 12px; color: #fff; font-weight: 600; }
+        .sky-label { font-size: 9px; color: #666; }
+        
+        /* 2h Forecast */
         .forecast-title {
-            font-size: 10px; text-transform: uppercase; color: #666;
-            margin-bottom: 8px; padding-bottom: 4px;
+            font-size: 9px; text-transform: uppercase; color: #666;
+            margin-bottom: 6px; padding-bottom: 4px;
             border-bottom: 1px solid #333;
         }
         .forecast-grid {
@@ -143,263 +130,227 @@
             text-align: center; border: 1px solid #333;
         }
         .forecast-card.now { border-color: #00b894; }
-        .forecast-time { font-size: 9px; color: #666; }
+        .forecast-time { font-size: 8px; color: #666; }
         .forecast-card.now .forecast-time { color: #00b894; font-weight: 600; }
-        .forecast-wave { font-size: 14px; font-weight: 600; color: #74b9ff; }
-        .forecast-wind { font-size: 12px; color: #fdcb6e; }
+        .forecast-icon { font-size: 14px; margin: 4px 0; }
+        .forecast-wave { font-size: 12px; font-weight: 600; color: #74b9ff; }
+        .forecast-wind { font-size: 10px; color: #fdcb6e; }
         
-        /* Mini Sparkline Chart */
-        .chart-section {
-            margin-top: 12px;
+        /* 3-Day Forecast */
+        .forecast-3day { margin-top: 10px; }
+        .day-card {
+            background: #252536; border-radius: 6px; padding: 8px;
+            display: flex; align-items: center; gap: 8px;
+            border: 1px solid #333; margin-bottom: 6px;
         }
-        .chart-title {
-            font-size: 10px; text-transform: uppercase; color: #666;
-            margin-bottom: 6px;
-        }
-        .sparkline-container {
-            background: #1e1e2e; border-radius: 6px; padding: 8px;
-            border: 1px solid #333;
-        }
-        .sparkline-label {
-            display: flex; justify-content: space-between; margin-bottom: 4px;
-        }
-        .sparkline-name { font-size: 9px; color: #888; }
-        .sparkline-value { font-size: 10px; font-weight: 600; color: #fff; }
-        .sparkline {
-            height: 30px; display: flex; align-items: flex-end; gap: 2px;
-        }
-        .sparkline-bar {
-            flex: 1; background: var(--bar-color, #00b894);
-            border-radius: 2px 2px 0 0; min-height: 3px;
-            opacity: 0.7;
-        }
-        .sparkline-bar.now { opacity: 1; }
+        .day-name { min-width: 45px; text-align: center; }
+        .day-name-text { font-size: 10px; color: #888; }
+        .day-name-text.today { color: #00b894; font-weight: 600; }
+        .day-icon { font-size: 18px; }
+        .day-info { flex: 1; }
+        .day-temps { font-size: 10px; color: #fff; }
+        .day-temps .max { color: #ff7675; }
+        .day-temps .min { color: #74b9ff; }
+        .day-stats { font-size: 9px; color: #888; margin-top: 2px; }
+        .day-status { font-size: 12px; }
         
         /* Status Badges */
         .status-row {
-            display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;
+            display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
         }
         .status-badge {
-            padding: 4px 8px; border-radius: 4px; font-size: 9px;
-            font-weight: 600; text-transform: uppercase;
+            padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 600;
         }
         .status-badge.good { background: rgba(0,184,148,0.2); color: #00b894; }
-        .status-badge.moderate { background: rgba(253,203,110,0.2); color: #fdcb6e; }
+        .status-badge.moderate { background: rgba(253,203,110,0.2); color: #f39c12; }
         .status-badge.bad { background: rgba(255,118,117,0.2); color: #ff7675; }
         
         .weather-footer {
-            padding: 8px 12px; text-align: center;
-            font-size: 9px; color: #555;
-            border-top: 1px solid #333;
+            padding: 6px 10px; text-align: center;
+            font-size: 8px; color: #555; border-top: 1px solid #333;
         }
         
-        /* Toggle Buttons for Mobile */
-        .weather-toggle {
-            position: fixed; top: 10px; left: 10px; z-index: 1001;
-            background: linear-gradient(90deg, #00b894, #00cec9);
-            color: #0a0a0f; border: none; padding: 10px 14px;
-            border-radius: 25px; cursor: pointer; font-weight: 600;
-            font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            display: none;
-        }
-        .sidebar-toggle {
-            position: fixed; top: 10px; right: 10px; z-index: 1001;
-            background: linear-gradient(135deg, #1F4E79, #2E86AB);
-            color: white; border: none; padding: 10px 14px;
-            border-radius: 25px; cursor: pointer; font-weight: 600;
-            font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            display: none;
-        }
-        
-        /* ============================================
-           SIDEBAR (RIGHT)
-           ============================================ */
+        /* ========== SIDEBAR (RIGHT) ========== */
         .sidebar {
-            position: fixed; top: 10px; right: 10px;
-            width: 300px; max-height: calc(100vh - 20px);
+            position: fixed; top: 60px; right: 10px;
+            width: 290px; max-height: calc(100vh - 80px);
             background: white; border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000;
             overflow-y: auto; font-size: 11px;
         }
         .sidebar-header {
             background: linear-gradient(135deg, #1F4E79, #2E86AB);
-            color: white; padding: 8px 10px; border-radius: 12px 12px 0 0;
+            color: white; padding: 10px 12px; border-radius: 12px 12px 0 0;
             display: flex; justify-content: space-between; align-items: center;
         }
         .sidebar-header h1 { font-size: 12px; margin: 0; }
-        .sidebar-header p { opacity: 0.8; font-size: 9px; margin: 0; }
+        .sidebar-header p { font-size: 9px; opacity: 0.8; margin: 2px 0 0 0; }
         .sidebar-close {
             background: rgba(255,255,255,0.2); border: none; color: white;
-            width: 24px; height: 24px; border-radius: 50%;
-            cursor: pointer; font-size: 14px; line-height: 1;
+            width: 22px; height: 22px; border-radius: 50%;
+            cursor: pointer; font-size: 14px;
             display: flex; align-items: center; justify-content: center;
         }
-        .sidebar-close:hover { background: rgba(255,255,255,0.3); }
         .sidebar-content { padding: 10px; }
         
         .counter {
             background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-            padding: 10px; border-radius: 8px; text-align: center;
-            margin-bottom: 12px; border: 2px solid #4CAF50;
+            padding: 8px; border-radius: 8px; text-align: center;
+            margin-bottom: 10px; border: 2px solid #4CAF50;
         }
-        .counter strong { font-size: 22px; color: #2E7D32; }
+        .counter strong { font-size: 20px; color: #2E7D32; }
+        .counter div { font-size: 10px; color: #666; }
         
-        .filter-section { margin-bottom: 12px; }
-        .filter-section h3 { font-size: 11px; color: #1F4E79; margin-bottom: 6px; text-transform: uppercase; }
-        .filter-group { display: flex; flex-wrap: wrap; gap: 4px; }
-        
-        .filter-btn {
-            padding: 5px 9px; border: 1px solid #ddd; border-radius: 15px;
-            background: white; cursor: pointer; font-size: 10px; transition: all 0.2s;
-        }
-        .filter-btn:hover { background: #f0f0f0; }
-        .filter-btn.active { color: white; border-color: transparent; }
-        .filter-btn.tenya.active { background: #e74c3c; }
-        .filter-btn.jigging.active { background: #9b59b6; }
-        .filter-btn.drifting.active { background: #3498db; }
-        .filter-btn.bolentino.active { background: #f39c12; }
-        .filter-btn.porto.active { background: #27ae60; }
-        .filter-btn.varie.active { background: #95a5a6; }
-        
-        .filter-btn.costa.active { background: #27ae60; }
-        .filter-btn.media.active { background: #f39c12; }
-        .filter-btn.largo.active { background: #3498db; }
-        
-        .action-buttons { display: flex; gap: 6px; margin-bottom: 12px; }
+        .action-buttons { display: flex; gap: 6px; margin-bottom: 10px; }
         .action-btn {
             flex: 1; padding: 8px; border: none; border-radius: 6px;
-            cursor: pointer; font-size: 11px; font-weight: 600; color: white; transition: all 0.2s;
+            cursor: pointer; font-size: 10px; font-weight: 600; color: white;
         }
         .btn-gps { background: #27ae60; }
         .btn-measure { background: #e67e22; }
         .btn-reset { background: #95a5a6; }
-        .action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
         
-        .legend { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
-        .legend h3 { font-size: 11px; margin-bottom: 6px; }
-        .legend-item { display: flex; align-items: center; margin-bottom: 4px; font-size: 10px; }
-        .legend-color { width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; }
+        .filter-section { margin-bottom: 10px; }
+        .filter-section h3 { font-size: 10px; color: #1F4E79; margin-bottom: 6px; text-transform: uppercase; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 4px; }
+        
+        .filter-btn {
+            padding: 5px 8px; border: 1px solid #ddd; border-radius: 15px;
+            background: white; cursor: pointer; font-size: 9px;
+        }
+        .filter-btn.active { color: white; border-color: transparent; }
+        .filter-btn.tenya.active { background: #e74c3c; }
+        .filter-btn.jigging.active { background: #9b59b6; }
+        .filter-btn.drifting.active { background: #3498db; }
+        .filter-btn.porto.active { background: #27ae60; }
+        .filter-btn.varie.active { background: #95a5a6; }
+        .filter-btn.costa.active { background: #27ae60; }
+        .filter-btn.media.active { background: #f39c12; }
+        .filter-btn.largo.active { background: #3498db; }
+        
+        .legend { background: #f8f9fa; padding: 8px; border-radius: 8px; margin-bottom: 10px; }
+        .legend h3 { font-size: 10px; margin-bottom: 6px; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 3px; font-size: 9px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
         .legend-new { background: #9b59b6; border: 2px solid #f39c12; }
         
-        .layer-control { position: fixed; bottom: 80px; right: 10px; z-index: 1000; }
+        /* ========== LAYER CONTROLS ========== */
+        .layer-control { position: fixed; bottom: 30px; right: 10px; z-index: 1000; }
         .layer-btn {
             display: block; width: 36px; height: 36px; background: white;
             border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             margin-bottom: 6px; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; font-size: 14px; transition: all 0.2s;
+            justify-content: center; font-size: 12px;
         }
-        .layer-btn:hover { transform: scale(1.1); }
         .layer-btn.active { background: #1F4E79; color: white; }
         
         .scale-bar {
-            position: fixed; bottom: 20px; left: 20px; background: white;
-            padding: 8px 12px; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000; font-size: 11px;
+            position: fixed; bottom: 30px; left: 10px; background: white;
+            padding: 6px 10px; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000; font-size: 10px;
         }
         .scale-bar-title { font-weight: bold; color: #1F4E79; margin-bottom: 4px; }
         .scale-bar-line { display: flex; align-items: center; gap: 4px; }
-        .scale-bar-fill { height: 8px; background: #1F4E79; border-radius: 2px; }
+        .scale-bar-fill { height: 6px; background: #1F4E79; border-radius: 2px; }
         
-        .spot-popup { min-width: 280px; }
+        /* ========== POPUP ========== */
+        .spot-popup { min-width: 260px; }
         .popup-header {
             background: linear-gradient(135deg, #1F4E79, #2E86AB);
-            color: white; padding: 10px; margin: -10px -10px 10px -10px; border-radius: 8px 8px 0 0;
+            color: white; padding: 10px; margin: -10px -10px 10px -10px;
+            border-radius: 8px 8px 0 0;
         }
-        .popup-header h2 { font-size: 14px; margin-bottom: 4px; }
-        .type-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; text-transform: uppercase; }
-        .new-badge { background: #f39c12; color: white; padding: 2px 6px; border-radius: 8px; font-size: 9px; margin-left: 5px; }
-        
+        .popup-header h2 { font-size: 13px; margin-bottom: 4px; }
+        .type-badge { 
+            display: inline-block; padding: 2px 8px; border-radius: 10px; 
+            font-size: 9px; text-transform: uppercase; 
+        }
+        .new-badge { 
+            background: #f39c12; color: white; padding: 2px 6px; 
+            border-radius: 8px; font-size: 9px; margin-left: 5px; 
+        }
         .popup-body { padding: 5px 0; }
-        .popup-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 11px; }
+        .popup-row { 
+            display: flex; justify-content: space-between; padding: 4px 0; 
+            border-bottom: 1px solid #eee; font-size: 10px; 
+        }
         .popup-row:last-child { border-bottom: none; }
         .popup-label { color: #666; }
         .popup-value { font-weight: 600; color: #333; }
-        .popup-value.nm { color: #1F4E79; font-size: 12px; }
+        .popup-value.nm { color: #1F4E79; }
         .popup-value.depth { color: #00897B; }
-        .popup-rating { color: #f39c12; font-size: 14px; }
+        .popup-rating { color: #f39c12; font-size: 12px; }
+        .popup-footer { 
+            margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd; 
+            font-size: 9px; color: #666; 
+        }
         
-        .popup-footer { margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 10px; color: #666; }
-        
+        /* ========== TOAST ========== */
         .toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
             background: #333; color: white; padding: 10px 20px; border-radius: 6px;
             z-index: 9999; animation: slideUp 0.3s ease;
         }
-        @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 20px; opacity: 1; } }
+        @keyframes slideUp { from { bottom: -50px; opacity: 0; } to { bottom: 80px; opacity: 1; } }
         
-        /* Mobile Responsive */
-        @media (max-width: 1024px) {
-            .weather-panel { width: 250px; }
-            .sidebar { width: 290px; }
-        }
+        /* ========== MOBILE RESPONSIVE ========== */
         @media (max-width: 768px) {
-            /* Pannelli nascosti di default su mobile */
+            .boat-name { 
+                font-size: 14px; padding: 6px 16px;
+                top: 8px;
+            }
+            
             .weather-panel, .sidebar { 
                 display: none;
                 width: calc(100% - 16px);
-                max-height: 45vh;
+                max-height: 50vh;
                 top: auto; bottom: 10px; left: 8px; right: 8px;
             }
             .weather-panel.visible, .sidebar.visible { display: block; }
             
-            /* Bottoni toggle sempre visibili */
-            .weather-toggle { display: flex !important; align-items: center; gap: 6px; }
-            .sidebar-toggle { 
-                position: fixed; top: 10px; right: 10px; z-index: 1001;
-                background: linear-gradient(135deg, #1F4E79, #2E86AB);
-                color: white; border: none; padding: 8px 12px;
-                border-radius: 20px; cursor: pointer; font-weight: 600;
-                font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            }
-            
-            /* Scala ridotta */
+            .layer-control { bottom: 20px; }
             .scale-bar { display: none; }
             
-            /* Popup più grandi per touch */
-            .spot-popup { min-width: 260px; }
-            .leaflet-popup-content { font-size: 13px; }
-        }
-        @media (max-width: 480px) {
-            .gauge-card { padding: 8px 4px; }
-            .gauge-value { font-size: 18px; }
-            .gauge-icon { font-size: 16px; }
-            .forecast-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+            .spot-popup { min-width: 240px; }
+            .leaflet-popup-content { font-size: 12px; }
         }
     </style>
 </head>
 <body>
-    <!-- GRAFANA-STYLE WEATHER PANEL (LEFT) -->
+    <!-- BOAT NAME -->
+    <div class="boat-name">🚤 LetiBlu</div>
+    
+    <!-- WEATHER PANEL -->
     <div class="weather-panel" id="weatherPanel">
         <div class="weather-header">
-            <div class="weather-header-content">
+            <div>
                 <h2>🌊 Meteo Mare</h2>
                 <p>Porto Cala de' Medici • <span id="lastUpdate">...</span></p>
             </div>
             <button class="close-btn" onclick="hideWeather()">×</button>
         </div>
         <div class="weather-content" id="weatherContent">
-            <div class="weather-loading">Caricamento...</div>
+            <div class="weather-loading">Caricamento dati...</div>
         </div>
+        <div class="weather-footer">Dati: Open-Meteo API</div>
     </div>
     
-    <button class="weather-toggle" onclick="toggleWeather()">🌊 Meteo</button>
-    <button class="sidebar-toggle" onclick="toggleSidebar()">🗺️ Spot</button>
-    
+    <!-- MAP -->
     <div id="map"></div>
     
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebarPanel">
         <div class="sidebar-header">
             <div>
                 <h1>🎣 Spot Pesca</h1>
-                <p id="spotCounterMobile">35 spot</p>
+                <p id="spotCounter">35 spot</p>
             </div>
             <button class="sidebar-close" onclick="hideSidebar()">×</button>
         </div>
-        
         <div class="sidebar-content">
             <div class="counter">
                 <div>Spot visibili</div>
-                <strong id="spotCounter">35/35</strong>
+                <strong id="spotCounterNum">35/35</strong>
             </div>
             
             <div class="action-buttons">
@@ -419,7 +370,7 @@
             </div>
             
             <div class="filter-section">
-                <h3>Fascia Distanza</h3>
+                <h3>Distanza</h3>
                 <div class="filter-group">
                     <button class="filter-btn costa active" data-filter="costa" onclick="toggleFilter(this)">🟢 Costa</button>
                     <button class="filter-btn media active" data-filter="media" onclick="toggleFilter(this)">🟡 Media</button>
@@ -430,33 +381,36 @@
             <div class="legend">
                 <h3>🗺️ Legenda</h3>
                 <div class="legend-item"><div class="legend-color" style="background:#e74c3c"></div> Tenya</div>
-                <div class="legend-item"><div class="legend-color" style="background:#9b59b6"></div> Jigging/Slow Pitch</div>
+                <div class="legend-item"><div class="legend-color" style="background:#9b59b6"></div> Jigging</div>
                 <div class="legend-item"><div class="legend-color" style="background:#3498db"></div> Drifting</div>
                 <div class="legend-item"><div class="legend-color" style="background:#27ae60"></div> Porto</div>
-                <div class="legend-item"><div class="legend-color legend-new"></div> 🆕 Nuovo Spot</div>
-                <hr style="margin:6px 0; border:none; border-top:1px solid #ddd">
+                <div class="legend-item"><div class="legend-color legend-new"></div> 🆕 Nuovo</div>
                 <div class="legend-item"><div class="legend-color" style="background:#e74c3c; border:2px dashed #e74c3c"></div> 6 nm</div>
                 <div class="legend-item"><div class="legend-color" style="background:#3498db; border:2px dashed #3498db"></div> 12 nm</div>
             </div>
             
-            <p style="font-size:9px; color:#999; text-align:center;">
-                💡 Coordinate da carte nautiche ufficiali
+            <p style="font-size:8px; color:#999; text-align:center;">
+                💡 35 spot verificati
             </p>
         </div>
     </div>
     
+    <!-- LAYER CONTROLS -->
     <div class="layer-control">
-        <div class="layer-btn active" onclick="toggleLayer('linea6nm')" title="Linea 6nm">6n</div>
-        <div class="layer-btn active" onclick="toggleLayer('linea12nm')" title="Linea 12nm">12n</div>
+        <div class="layer-btn active" onclick="toggleLayer('linea6nm')" title="6nm">6n</div>
+        <div class="layer-btn active" onclick="toggleLayer('linea12nm')" title="12nm">12n</div>
         <div class="layer-btn" onclick="toggleLayer('satellite')" title="Satellite">🛰️</div>
+        <div class="layer-btn" onclick="toggleWeather()" title="Meteo">🌊</div>
+        <div class="layer-btn" onclick="toggleSidebar()" title="Spot">🗺️</div>
     </div>
     
+    <!-- SCALE BAR -->
     <div class="scale-bar">
-        <div class="scale-bar-title">Scala Miglia Nautiche</div>
+        <div class="scale-bar-title">Scala</div>
         <div class="scale-bar-line">
-            <div style="width:20px; text-align:right; font-size:10px;">0</div>
-            <div class="scale-bar-fill" style="width:60px;"></div>
-            <div style="font-size:10px;">5 nm</div>
+            <div style="width:15px; text-align:right; font-size:9px;">0</div>
+            <div class="scale-bar-fill" style="width:50px;"></div>
+            <div style="font-size:9px;">5 nm</div>
         </div>
     </div>
 
@@ -465,117 +419,104 @@
     
     <script>
     // ============================================================
-    // METEO DATA (Open-Meteo API)
+    // METEO - Open-Meteo API
     // ============================================================
     const METEO_LAT = 43.39;
     const METEO_LON = 10.43;
     
     async function fetchWeatherData() {
         const container = document.getElementById('weatherContent');
-        container.innerHTML = '<div class="weather-loading">Caricamento dati meteo...</div>';
+        container.innerHTML = '<div class="weather-loading">Caricamento...</div>';
         
         try {
-            // Fetch weather + marine + daily forecast from Open-Meteo
-            const [weatherRes, marineRes] = await Promise.all([
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${METEO_LAT}&longitude=${METEO_LON}&current=temperature_2m,wind_speed_10m,wind_direction_10m,pressure_msl,weather_code&hourly=wave_height,wave_direction,wind_speed_10m,wind_direction_10m,temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_probability_max&timezone=auto&forecast_days=3`),
-                fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${METEO_LAT}&longitude=${METEO_LON}&hourly=wave_height,wave_direction,swell_wave_height,wind_wave_height&timezone=auto&forecast_days=3`)
-            ]);
-            
-            const weather = await weatherRes.json();
-            const marine = await marineRes.ok ? await marineRes.json() : null;
-            
-            renderWeatherPanel(weather, marine);
+            const res = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${METEO_LAT}&longitude=${METEO_LON}` +
+                `&current=temperature_2m,wind_speed_10m,wind_direction_10m,pressure_msl,weather_code` +
+                `&hourly=wave_height,wind_speed_10m,weather_code,wind_direction_10m` +
+                `&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_probability_max` +
+                `&timezone=auto&forecast_days=3`
+            );
+            const data = await res.json();
+            renderWeather(data);
         } catch (err) {
-            console.error('Meteo error:', err);
-            container.innerHTML = '<div class="weather-error">⚠️ Errore caricamento dati<br><small>Riprova tra qualche secondo</small></div>';
+            container.innerHTML = '<div style="padding:20px; text-align:center; color:#ff6b6b;">⚠️ Errore caricamento</div>';
         }
     }
     
-    function renderWeatherPanel(weather, marine) {
-        const container = document.getElementById('weatherContent');
-        const current = weather.current;
-        
-        // Get hour index for current time
+    function renderWeather(data) {
+        const c = data.current;
         const now = new Date();
-        const hourStr = now.getHours().toString().padStart(2, '0') + ':00';
-        const hourIndex = weather.hourly.time.findIndex(t => t.includes(hourStr));
-        
-        // Extract data
-        const temp = current.temperature_2m;
-        const windSpeedKmh = current.wind_speed_10m;
-        const windSpeedKn = (windSpeedKmh * 0.539957).toFixed(1); // Convert to knots
-        const windDir = current.wind_direction_10m;
-        const pressure = current.pressure_msl;
-        const weatherCode = current.weather_code;
-        const waveHeight = marine?.hourly?.wave_height?.[hourIndex] || (weather.hourly.wave_height?.[hourIndex] || 0.5);
-        const swellHeight = marine?.hourly?.swell_wave_height?.[hourIndex] || 0.3;
-        const waveDir = marine?.hourly?.wave_direction?.[hourIndex] || 180;
-        
-        // Get sky condition from weather code
-        const skyCondition = getSkyCondition(weatherCode);
-        const skyIcon = skyCondition.icon;
-        const skyDesc = skyCondition.desc;
-        
-        // Update timestamp
         document.getElementById('lastUpdate').textContent = now.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
         
-        // Get forecast for next 3 hours with sky conditions
-        const forecastHtml = [0, 1, 2].map((offset, i) => {
-            const idx = Math.min(hourIndex + offset, (weather.hourly.time?.length || 24) - 1);
-            const time = new Date(weather.hourly.time?.[idx] || Date.now());
-            const fWave = marine?.hourly?.wave_height?.[idx] || 0.5;
-            const fWindKmh = weather.hourly.wind_speed_10m?.[idx] || 0;
-            const fWindKn = Math.round(fWindKmh * 0.539957);
-            // Get weather code for this hour
-            const hourlyWeather = weather.hourly.weather_code?.[idx] || current.weather_code;
-            const fSky = getSkyCondition(hourlyWeather);
-            const hourLabel = i === 0 ? 'ORA' : '+' + offset + 'h';
-            return `
-                <div class="forecast-card ${i === 0 ? 'now' : ''}">
-                    <div class="forecast-time">${hourLabel}</div>
-                    <div style="font-size:16px; margin:4px 0;">${fSky.icon}</div>
-                    <div class="forecast-wave">${fWave.toFixed(1)}m</div>
-                    <div class="forecast-wind">${fWindKn} kn</div>
-                </div>
-            `;
-        }).join('');
+        // Get current hour index
+        const hourStr = now.getHours().toString().padStart(2, '0') + ':00';
+        const hourIdx = data.hourly.time.findIndex(t => t.includes(hourStr));
         
-        // Build sparkline bars for waves
-        const waveBars = [0, 1, 2, 3, 4, 5].map((offset, i) => {
-            const idx = Math.min(hourIndex + offset, weather.hourly.time.length - 1);
-            const val = marine?.hourly?.wave_height?.[idx] || 0.5;
-            const max = 3; // max scale
-            const height = Math.max(3, (val / max) * 28);
-            return `<div class="sparkline-bar ${offset === 0 ? 'now' : ''}" style="height:${height}px; --bar-color:#74b9ff;"></div>`;
-        }).join('');
+        const temp = c.temperature_2m;
+        const windKmh = c.wind_speed_10m;
+        const windKn = Math.round(windKmh * 0.539957);
+        const windDir = c.wind_direction_10m;
+        const pressure = c.pressure_msl;
+        const weatherCode = c.weather_code;
+        const waveHeight = data.hourly.wave_height?.[hourIdx] || 0.5;
         
-        const windBars = [0, 1, 2, 3, 4, 5].map((offset, i) => {
-            const idx = Math.min(hourIndex + offset, weather.hourly.time.length - 1);
-            const val = weather.hourly.wind_speed_10m[idx] || 0;
-            const max = 30;
-            const height = Math.max(3, (val / max) * 28);
-            return `<div class="sparkline-bar ${offset === 0 ? 'now' : ''}" style="height:${height}px; --bar-color:#fdcb6e;"></div>`;
-        }).join('');
+        // Wind direction (From = where wind comes from)
+        const windFrom = getWindDir(windDir);
+        // Wind direction (To = where wind goes to)
+        const windTo = getWindDir((windDir + 180) % 360);
         
-        // Wind direction: API gives direction wind is COMING FROM
-        // Arrow should point where wind is GOING TO (opposite direction)
-        const windDirStr = getWindDirectionPrecise(windDir);
-        const windDirTo = ((windDir + 180) % 360); // Direction wind is going TO
+        // Sky condition
+        const sky = getSkyCondition(weatherCode);
+        
+        // 2h forecast
+        const forecast2h = [0, 1, 2].map((o, i) => {
+            const idx = Math.min(hourIdx + i, data.hourly.time.length - 1);
+            const wCode = data.hourly.weather_code?.[idx] || 0;
+            const wKn = Math.round((data.hourly.wind_speed_10m?.[idx] || 0) * 0.539957);
+            const wv = data.hourly.wave_height?.[idx] || 0.5;
+            return {
+                label: i === 0 ? 'ORA' : '+' + i + 'h',
+                icon: getSkyCondition(wCode).icon,
+                wave: wv.toFixed(1),
+                wind: wKn
+            };
+        });
+        
+        // 3-day forecast
+        const days = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+        const today = now.getDay();
+        const forecast3d = data.daily.time.slice(0, 3).map((d, i) => ({
+            name: i === 0 ? 'Oggi' : (i === 1 ? 'Domani' : days[(today + i) % 7]),
+            isToday: i === 0,
+            icon: getSkyCondition(data.daily.weather_code[i]).icon,
+            maxTemp: Math.round(data.daily.temperature_2m_max[i]),
+            minTemp: Math.round(data.daily.temperature_2m_min[i]),
+            maxWind: Math.round(data.daily.wind_speed_10m_max[i] * 0.539957),
+            rainProb: data.daily.precipitation_probability_max[i] || 0,
+            status: getFishingStatus(data.daily.wind_speed_10m_max[i] * 0.539957)
+        }));
         
         // Status badges
-        const fishingStatus = getFishingStatus(parseFloat(windSpeedKn), waveHeight);
+        const status = [];
+        status.push(windKn < 10 ? {label: '🌬️ Vento Leggero', level: 'good'} :
+                    windKn < 18 ? {label: '💨 Vento Moderato', level: 'moderate'} :
+                    {label: '🌀 Vento Forte', level: 'bad'});
+        status.push(waveHeight < 0.5 ? {label: '🌊 Mare Calmo', level: 'good'} :
+                    waveHeight < 1.2 ? {label: '🌊 Mare Mosso', level: 'moderate'} :
+                    {label: '🌊 Mare Agitato', level: 'bad'});
         
-        container.innerHTML = `
-            <!-- Current Conditions Grid -->
-            <!-- Sky & Wind Summary -->
-            <div style="background:linear-gradient(135deg, #2d2d44, #252536); border-radius:8px; padding:10px; margin-bottom:12px; display:flex; align-items:center; gap:10px; border:1px solid #3d3d5c;">
-                <div style="font-size:28px;">${skyIcon}</div>
-                <div style="flex:1;">
-                    <div style="font-size:12px; color:#fff; font-weight:600;">${skyDesc}</div>
-                    <div style="font-size:10px; color:#888;">Cielo attuale</div>
+        // Render
+        document.getElementById('weatherContent').innerHTML = `
+            <!-- Sky -->
+            <div class="sky-card">
+                <div class="sky-icon">${sky.icon}</div>
+                <div class="sky-info">
+                    <div class="sky-desc">${sky.desc}</div>
+                    <div class="sky-label">Cielo attuale</div>
                 </div>
             </div>
             
+            <!-- Gauges -->
             <div class="current-conditions">
                 <div class="gauge-card wave">
                     <div class="gauge-icon">🌊</div>
@@ -585,412 +526,259 @@
                 </div>
                 <div class="gauge-card wind">
                     <div class="gauge-icon">💨</div>
-                    <div class="gauge-value">${windSpeedKn}</div>
+                    <div class="gauge-value">${windKn}</div>
                     <div class="gauge-unit">nodi</div>
                     <div class="gauge-label">Vento</div>
                 </div>
                 <div class="gauge-card temp">
                     <div class="gauge-icon">🌡️</div>
-                    <div class="gauge-value">${temp.toFixed(0)}°</div>
+                    <div class="gauge-value">${Math.round(temp)}°</div>
                     <div class="gauge-unit">Celsius</div>
                     <div class="gauge-label">Temperatura</div>
                 </div>
                 <div class="gauge-card pressure">
                     <div class="gauge-icon">📊</div>
-                    <div class="gauge-value">${pressure.toFixed(0)}</div>
+                    <div class="gauge-value">${Math.round(pressure)}</div>
                     <div class="gauge-unit">hPa</div>
                     <div class="gauge-label">Pressione</div>
                 </div>
             </div>
             
-            <!-- Wind Compass with From/To -->
+            <!-- Wind Direction -->
             <div class="wind-compass">
-                <div style="font-size:9px; color:#666; margin-bottom:6px; text-transform:uppercase;">Direzione Vento</div>
-                <div class="compass-row">
-                    <div class="compass-circle">
-                        <div class="compass-arrow" style="transform: translateY(-50%) rotate(${windDirTo}deg);"></div>
+                <div class="wind-compass-title">Direzione Vento</div>
+                <div class="wind-compass-row">
+                    <div>
+                        <div class="wind-compass-label">Da</div>
+                        <div class="wind-compass-dir from">${windFrom}</div>
                     </div>
-                    <div class="compass-info">
-                        <div style="font-size:10px; color:#888; margin-bottom:2px;">
-                            <span style="color:#74b9ff;">← Da ${windDirStr}</span>
-                        </div>
-                        <div style="font-size:10px; color:#888;">
-                            <span style="color:#fdcb6e;">→ Verso ${getWindDirectionPrecise(windDirTo)}</span>
-                        </div>
-                        <div class="compass-speed">${windSpeedKn} kn</div>
+                    <div class="wind-compass-arrow">→</div>
+                    <div>
+                        <div class="wind-compass-label">Verso</div>
+                        <div class="wind-compass-dir to">${windTo}</div>
                     </div>
                 </div>
             </div>
             
             <!-- 2h Forecast -->
-            <div class="forecast-title">📈 Previsione Prossime 2 Ore</div>
+            <div class="forecast-title">📈 Prossime 2 Ore</div>
             <div class="forecast-grid">
-                ${forecastHtml}
-            </div>
-            
-            <!-- Wave Sparkline -->
-            <div class="chart-section">
-                <div class="chart-title">Onda (prossime 6h)</div>
-                <div class="sparkline-container">
-                    <div class="sparkline">${waveBars}</div>
-                </div>
-            </div>
-            
-            <!-- Wind Sparkline -->
-            <div class="chart-section">
-                <div class="chart-title">Vento (prossime 6h)</div>
-                <div class="sparkline-container">
-                    <div class="sparkline">${windBars}</div>
-                </div>
-            </div>
-            
-            <!-- Status Badges -->
-            <div class="status-row">
-                ${fishingStatus.map(s => `<span class="status-badge ${s.level}">${s.label}</span>`).join('')}
+                ${forecast2h.map(f => `
+                    <div class="forecast-card ${f.label === 'ORA' ? 'now' : ''}">
+                        <div class="forecast-time">${f.label}</div>
+                        <div class="forecast-icon">${f.icon}</div>
+                        <div class="forecast-wave">${f.wave}m</div>
+                        <div class="forecast-wind">${f.wind} kn</div>
+                    </div>
+                `).join('')}
             </div>
             
             <!-- 3-Day Forecast -->
-            <div class="forecast-title" style="margin-top:15px;">📅 Previsione 3 Giorni</div>
-            <div style="display:flex; flex-direction:column; gap:6px;">
-                ${render3DayForecast(weather)}
+            <div class="forecast-title forecast-3day">📅 Prossimi 3 Giorni</div>
+            ${forecast3d.map(d => `
+                <div class="day-card">
+                    <div class="day-name">
+                        <div class="day-name-text ${d.isToday ? 'today' : ''}">${d.name}</div>
+                        <div class="day-icon">${d.icon}</div>
+                    </div>
+                    <div class="day-info">
+                        <div class="day-temps">
+                            <span class="max">${d.maxTemp}°</span> / <span class="min">${d.minTemp}°</span>
+                        </div>
+                        <div class="day-stats">💨 ${d.maxWind} kn • 🌧️ ${d.rainProb}%</div>
+                    </div>
+                    <div class="day-status">${d.status === 'good' ? '🟢' : d.status === 'moderate' ? '🟡' : '🔴'}</div>
+                </div>
+            `).join('')}
+            
+            <!-- Status -->
+            <div class="status-row">
+                ${status.map(s => `<span class="status-badge ${s.level}">${s.label}</span>`).join('')}
             </div>
         `;
     }
     
-    function getWindDirection(deg) {
-        const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-        const idx = Math.round(deg / 45) % 8;
-        return dirs[idx];
+    function getWindDir(deg) {
+        const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+        return dirs[Math.round(deg / 22.5) % 16];
     }
     
-    // More precise 16-direction wind direction
-    function getWindDirectionPrecise(deg) {
-        const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 
-                      'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
-        // Normalize to 0-360
-        deg = ((deg % 360) + 360) % 360;
-        const idx = Math.round(deg / 22.5) % 16;
-        return dirs[idx];
-    }
-    
-    // Get sky condition from WMO weather code
     function getSkyCondition(code) {
         const conditions = {
-            0: { icon: '☀️', desc: 'Sereno' },
-            1: { icon: '🌤️', desc: 'Prevalentemente sereno' },
-            2: { icon: '⛅', desc: 'Parzialmente nuvoloso' },
-            3: { icon: '☁️', desc: 'Coperto' },
-            45: { icon: '🌫️', desc: 'Nebbia' },
-            48: { icon: '🌫️', desc: 'Nebbia ghiacciata' },
-            51: { icon: '🌧️', desc: 'Pioviggine leggera' },
-            53: { icon: '🌧️', desc: 'Pioviggine' },
-            55: { icon: '🌧️', desc: 'Pioviggine intensa' },
-            56: { icon: '🌧️', desc: 'Pioviggine gelida' },
-            57: { icon: '🌧️', desc: 'Pioviggine gelida intensa' },
-            61: { icon: '🌧️', desc: 'Pioggia leggera' },
-            63: { icon: '🌧️', desc: 'Pioggia' },
-            65: { icon: '🌧️', desc: 'Pioggia forte' },
-            66: { icon: '🌧️', desc: 'Pioggia gelida' },
-            67: { icon: '🌧️', desc: 'Pioggia gelida forte' },
-            71: { icon: '🌨️', desc: 'Neve leggera' },
-            73: { icon: '🌨️', desc: 'Neve' },
-            75: { icon: '🌨️', desc: 'Neve forte' },
-            77: { icon: '🌨️', desc: 'Grani di neve' },
-            80: { icon: '🌦️', desc: 'Rovesci leggeri' },
-            81: { icon: '🌦️', desc: 'Rovesci' },
-            82: { icon: '⛈️', desc: 'Rovesci violenti' },
-            85: { icon: '🌨️', desc: 'Rovesci di neve' },
-            86: { icon: '🌨️', desc: 'Rovesci neve forte' },
-            95: { icon: '⛈️', desc: 'Temporale' },
-            96: { icon: '⛈️', desc: 'Temporale con grandine' },
-            99: { icon: '⛈️', desc: 'Temporale forte grandine' },
+            0: {icon: '☀️', desc: 'Sereno'},
+            1: {icon: '🌤️', desc: 'Prevalentemente sereno'},
+            2: {icon: '⛅', desc: 'Parzialmente nuvoloso'},
+            3: {icon: '☁️', desc: 'Coperto'},
+            45: {icon: '🌫️', desc: 'Nebbia'},
+            51: {icon: '🌧️', desc: 'Pioviggine'},
+            61: {icon: '🌧️', desc: 'Pioggia leggera'},
+            63: {icon: '🌧️', desc: 'Pioggia'},
+            65: {icon: '🌧️', desc: 'Pioggia forte'},
+            71: {icon: '🌨️', desc: 'Neve'},
+            80: {icon: '🌦️', desc: 'Rovesci'},
+            81: {icon: '🌦️', desc: 'Rovesci'},
+            82: {icon: '⛈️', desc: 'Temporale'},
+            95: {icon: '⛈️', desc: 'Temporale'},
+            99: {icon: '⛈️', desc: 'Temporale forte'},
         };
-        return conditions[code] || { icon: '🌤️', desc: 'Variabile' };
+        return conditions[code] || {icon: '🌤️', desc: 'Variabile'};
     }
     
-    function getFishingStatus(windSpeedKn, waveHeight) {
-        const status = [];
-        
-        // Wind condition (in knots)
-        if (windSpeedKn < 10) status.push({ label: '🌬️ Vento Leggero', level: 'good' });
-        else if (windSpeedKn < 18) status.push({ label: '💨 Vento Moderato', level: 'moderate' });
-        else status.push({ label: '🌀 Vento Forte', level: 'bad' });
-        
-        // Sea condition
-        if (waveHeight < 0.5) status.push({ label: '🌊 Mare Calmo', level: 'good' });
-        else if (waveHeight < 1.2) status.push({ label: '🌊 Mare Mosso', level: 'moderate' });
-        else status.push({ label: '🌊 Mare Agitato', level: 'bad' });
-        
-        return status;
+    function getFishingStatus(windKn) {
+        return windKn < 15 ? 'good' : windKn < 25 ? 'moderate' : 'bad';
     }
     
-    function render3DayForecast(weather) {
-        const daily = weather.daily;
-        if (!daily || !daily.time) return '';
-        
-        const days = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
-        const today = new Date().getDay();
-        
-        return daily.time.slice(0, 3).map((date, i) => {
-            const d = new Date(date);
-            const dayName = i === 0 ? 'Oggi' : (i === 1 ? 'Domani' : days[(today + i) % 7]);
-            const sky = getSkyCondition(daily.weather_code[i]);
-            const maxTemp = daily.temperature_2m_max[i];
-            const minTemp = daily.temperature_2m_min[i];
-            const maxWind = Math.round(daily.wind_speed_10m_max[i] * 0.539957);
-            const rainProb = daily.precipitation_probability_max[i] || 0;
-            
-            // Determine fishing condition based on wind
-            const windStatus = maxWind < 15 ? 'good' : maxWind < 25 ? 'moderate' : 'bad';
-            const statusColor = windStatus === 'good' ? '#00b894' : windStatus === 'moderate' ? '#f39c12' : '#ff6b6b';
-            const statusText = windStatus === 'good' ? '🟢' : windStatus === 'moderate' ? '🟡' : '🔴';
-            
-            return `
-                <div style="background:#252536; border-radius:6px; padding:8px 10px; display:flex; align-items:center; gap:8px; border:1px solid #333;">
-                    <div style="text-align:center; min-width:45px;">
-                        <div style="font-size:10px; color:${i === 0 ? '#00b894' : '#888'}; font-weight:${i === 0 ? '600' : '400'};">${dayName}</div>
-                        <div style="font-size:16px; margin:2px 0;">${sky.icon}</div>
-                    </div>
-                    <div style="flex:1;">
-                        <div style="display:flex; justify-content:space-between; font-size:9px; color:#888;">
-                            <span>💨 ${maxWind} kn</span>
-                            <span>🌧️ ${rainProb}%</span>
-                        </div>
-                        <div style="font-size:10px; color:#fff; margin-top:2px;">
-                            <span style="color:#ff7675;">${maxTemp}°</span> / <span style="color:#74b9ff;">${minTemp}°</span>
-                        </div>
-                    </div>
-                    <div style="font-size:11px; color:${statusColor};">
-                        ${statusText} <span style="font-size:9px;">pesca</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
+    function hideWeather() {
+        document.getElementById('weatherPanel').classList.remove('visible');
     }
     
     function toggleWeather() {
         const panel = document.getElementById('weatherPanel');
-        const sidebar = document.getElementById('sidebarPanel');
-        // Hide sidebar when showing weather
-        if (!panel.classList.contains('visible') && sidebar) {
-            sidebar.classList.remove('visible');
-        }
-        panel.classList.toggle('visible');
-    }
-    
-    function hideWeather() {
-        const panel = document.getElementById('weatherPanel');
-        panel.classList.remove('visible');
-    }
-    
-    function toggleSidebar() {
-        const panel = document.getElementById('sidebarPanel');
-        const weather = document.getElementById('weatherPanel');
-        // Hide weather when showing sidebar
-        if (!panel.classList.contains('visible') && weather) {
-            weather.classList.remove('visible');
-        }
         panel.classList.toggle('visible');
     }
     
     function hideSidebar() {
-        const panel = document.getElementById('sidebarPanel');
-        panel.classList.remove('visible');
+        document.getElementById('sidebarPanel').classList.remove('visible');
     }
     
-    // Check if mobile on load
-    function checkMobile() {
-        if (window.innerWidth <= 768) {
-            document.querySelector('.weather-toggle').style.display = 'flex';
-            document.querySelector('.sidebar-toggle').style.display = 'flex';
-        }
+    function toggleSidebar() {
+        document.getElementById('sidebarPanel').classList.toggle('visible');
     }
-    
+
     // ============================================================
-    // 35 SPOTS (27 originali + 8 nuovi Slow Pitch)
+    // 35 SPOTS
     // ============================================================
     const SPOTS = [
-        { id: "porto", name: "Porto Cala de' Medici", type: "Porto", typeKey: "porto", lat: 43.3945, lon: 10.4264, depth: "N/A", fondale: "Porto", tecnica: "Base", description: "Marina di Rosignano Marittimo", zone: "Centro", distance_nm: 0, fascia: "costa", difficulty: "facile", rating: 1, isFeature: false, isNew: false },
-        { id: "faro-vada", name: "Faro di Vada", type: "Feature", typeKey: "varie", lat: 43.32, lon: 10.365, depth: "2-15", fondale: "Secca", tecnica: "Varie", description: "Secca segnalata dal faro.", zone: "Centro", distance_nm: 5.21, fascia: "media", difficulty: "facile", rating: 3, isFeature: true, isNew: false },
-        { id: "sperone-esterno", name: "Sperone di Fuori", type: "Feature", typeKey: "varie", lat: 43.305, lon: 10.30, depth: "39-52", fondale: "Reef", tecnica: "Varie", description: "Reef parallelo alla costa.", zone: "Sud", distance_nm: 7.7, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: true, isNew: false },
-        { id: "sperone-testa", name: "Testa dello Sperone", type: "Feature", typeKey: "varie", lat: 43.315, lon: 10.31, depth: "34-48", fondale: "Reef", tecnica: "Varie", description: "Zona dove lo Sperone curva.", zone: "Sud", distance_nm: 6.97, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: true, isNew: false },
-        { id: "sperone-interno", name: "Sperone di Dentro", type: "Feature", typeKey: "varie", lat: 43.32, lon: 10.32, depth: "36-48", fondale: "Reef", tecnica: "Varie", description: "Reef perpendicolare.", zone: "Centro", distance_nm: 6.45, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: true, isNew: false },
-        { id: "muraglione", name: "Muraglione", type: "Feature", typeKey: "varie", lat: 43.318, lon: 10.34, depth: "22-48", fondale: "Ciglio", tecnica: "Varie", description: "Parete quasi verticale.", zone: "Sud", distance_nm: 5.94, fascia: "media", difficulty: "medio", rating: 4, isFeature: true, isNew: false },
-        { id: "puntaccia", name: "Puntaccia", type: "Feature", typeKey: "varie", lat: 43.295, lon: 10.28, depth: "46-52", fondale: "Reef", tecnica: "Varie", description: "Scogliera ad arco.", zone: "Sud", distance_nm: 8.75, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: true, isNew: false },
-        { id: "ciglio-terra", name: "Ciglio di Terra", type: "Feature", typeKey: "varie", lat: 43.325, lon: 10.35, depth: "34-48", fondale: "Ciglio", tecnica: "Varie", description: "Ciglio vicino a costa.", zone: "Centro", distance_nm: 5.34, fascia: "media", difficulty: "medio", rating: 4, isFeature: true, isNew: false },
-        { id: "marmi", name: "I Marmi", type: "Feature", typeKey: "varie", lat: 43.285, lon: 10.26, depth: "50-80", fondale: "Secca", tecnica: "Varie", description: "Rocce profonde.", zone: "Sud", distance_nm: 9.8, fascia: "largo", difficulty: "molto difficile", rating: 5, isFeature: true, isNew: false },
-        { id: "genepesca", name: "Relitto Genepesca", type: "Feature", typeKey: "varie", lat: 43.315, lon: 10.35, depth: "20-30", fondale: "Relitto", tecnica: "Varie", description: "Motonave affondata.", zone: "Sud", distance_nm: 5.82, fascia: "media", difficulty: "medio", rating: 5, isFeature: true, isNew: false },
-        { id: "secca-calafuria", name: "Secca di Calafuria", type: "Feature", typeKey: "varie", lat: 43.41, lon: 10.30, depth: "18-52", fondale: "Secca", tecnica: "Varie", description: "Falesie di arenaria.", zone: "Nord", distance_nm: 5.59, fascia: "media", difficulty: "medio", rating: 4, isFeature: true, isNew: false },
-        { id: "secca-romito", name: "Secca del Romito", type: "Feature", typeKey: "varie", lat: 43.395, lon: 10.295, depth: "25-45", fondale: "Secca", tecnica: "Varie", description: "Affioramento roccioso.", zone: "Nord", distance_nm: 5.73, fascia: "media", difficulty: "medio", rating: 4, isFeature: true, isNew: false },
-        { id: "scogli-sonnino", name: "Scogli del Sonnino", type: "Feature", typeKey: "varie", lat: 43.435, lon: 10.32, depth: "12-28", fondale: "Scoglio", tecnica: "Varie", description: "Prolungamento sommerso.", zone: "Nord", distance_nm: 5.24, fascia: "media", difficulty: "facile", rating: 3, isFeature: true, isNew: false },
-        { id: "secca-punta-righini", name: "Secca di Punta Righini", type: "Feature", typeKey: "varie", lat: 43.395, lon: 10.38, depth: "15-30", fondale: "Secca", tecnica: "Varie", description: "Prolungamento sommerso.", zone: "Nord", distance_nm: 2.02, fascia: "costa", difficulty: "facile", rating: 3, isFeature: true, isNew: false },
-        { id: "secca-quercetano", name: "Secca del Quercetano", type: "Feature", typeKey: "varie", lat: 43.36, lon: 10.30, depth: "20-38", fondale: "Secca", tecnica: "Varie", description: "Secca rocciosa.", zone: "Centro", distance_nm: 5.89, fascia: "media", difficulty: "medio", rating: 4, isFeature: true, isNew: false },
-        { id: "secca-lillatro", name: "Secca del Lillatro", type: "Feature", typeKey: "varie", lat: 43.335, lon: 10.32, depth: "18-35", fondale: "Secca", tecnica: "Varie", description: "Secca tra Rosignano e Vada.", zone: "Centro", distance_nm: 5.86, fascia: "media", difficulty: "medio", rating: 3, isFeature: true, isNew: false },
-        { id: "ciglio-cecina", name: "Ciglio di Cecina", type: "Feature", typeKey: "varie", lat: 43.25, lon: 10.30, depth: "30-55", fondale: "Ciglio", tecnica: "Varie", description: "Caduta netta.", zone: "Sud", distance_nm: 10.28, fascia: "largo", difficulty: "difficile", rating: 5, isFeature: true, isNew: false },
-        { id: "pre-testa-sperone-tenya", name: "Testa Sperone - Tenya", type: "Tenya", typeKey: "tenya", lat: 43.315, lon: 10.31, depth: "34-42", fondale: "Secca Rocciosa", tecnica: "Tenya", description: "Roccia compatta.", zone: "Sud", distance_nm: 6.97, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-muraglione-tenya", name: "Muraglione - Tenya", type: "Tenya", typeKey: "tenya", lat: 43.318, lon: 10.34, depth: "22-48", fondale: "Ciglio/Caduta", tecnica: "Tenya", description: "Parete verticale.", zone: "Sud", distance_nm: 5.94, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-ciglio-terra-tenya", name: "Ciglio di Terra - Tenya", type: "Tenya", typeKey: "tenya", lat: 43.325, lon: 10.35, depth: "34-48", fondale: "Ciglio/Caduta", tecnica: "Tenya", description: "Ciglio vicino costa.", zone: "Centro", distance_nm: 5.34, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-calafuria-tenya", name: "Secca Calafuria - Tenya", type: "Tenya", typeKey: "tenya", lat: 43.41, lon: 10.30, depth: "18-52", fondale: "Misto", tecnica: "Tenya", description: "Falesie.", zone: "Nord", distance_nm: 5.59, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-sperone-interno-slow", name: "Sperone Interno - SP", type: "Jigging", typeKey: "jigging", lat: 43.32, lon: 10.32, depth: "36-48", fondale: "Secca Rocciosa", tecnica: "Slow Pitch Jigging", description: "Reef.", zone: "Centro", distance_nm: 6.45, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-sperone-fuori-slow", name: "Sperone di Fuori - SP", type: "Jigging", typeKey: "jigging", lat: 43.305, lon: 10.30, depth: "39-52", fondale: "Secca Rocciosa", tecnica: "Slow Pitch Jigging", description: "Reef.", zone: "Sud", distance_nm: 7.7, fascia: "largo", difficulty: "difficile", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-puntaccia-slow", name: "Puntaccia - SP", type: "Jigging", typeKey: "jigging", lat: 43.295, lon: 10.28, depth: "46-52", fondale: "Secca Rocciosa", tecnica: "Slow Pitch Jigging", description: "OLTRE 6nm!", zone: "Sud", distance_nm: 8.75, fascia: "largo", difficulty: "difficile", rating: 5, isFeature: false, isNew: false },
-        { id: "pre-romito-slow", name: "Secca Romito - SP", type: "Jigging", typeKey: "jigging", lat: 43.395, lon: 10.295, depth: "25-45", fondale: "Roccioso", tecnica: "Slow Pitch Jigging", description: "Affioramento.", zone: "Nord", distance_nm: 5.73, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-quercetano-slow", name: "Secca Quercetano - SP", type: "Jigging", typeKey: "jigging", lat: 43.36, lon: 10.30, depth: "20-38", fondale: "Ciglio/Caduta", tecnica: "Slow Pitch Jigging", description: "Ciglio.", zone: "Centro", distance_nm: 5.89, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: false },
-        { id: "pre-ciglio-cecina", name: "Ciglio Cecina - SP", type: "Jigging", typeKey: "jigging", lat: 43.25, lon: 10.30, depth: "30-55", fondale: "Ciglio/Caduta", tecnica: "Slow Pitch Jigging", description: "Caduta.", zone: "Sud", distance_nm: 10.28, fascia: "largo", difficulty: "difficile", rating: 5, isFeature: false, isNew: false },
-        { id: "sp-1", name: "Lillatro SP", type: "Jigging", typeKey: "jigging", lat: 43.340, lon: 10.325, depth: "35-45", fondale: "Roccioso", tecnica: "Slow Pitch Jigging", description: "Transizione sabbia-roccia. 🆕 2025", zone: "Vada", distance_nm: 5.5, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: true },
-        { id: "sp-2", name: "Banco Lillatro", type: "Jigging", typeKey: "jigging", lat: 43.338, lon: 10.315, depth: "40-50", fondale: "Secca", tecnica: "Slow Pitch Jigging", description: "Banco roccioso. 🆕 2025", zone: "Vada", distance_nm: 5.9, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: true },
-        { id: "sp-3", name: "Falesia Sommersa Nord", type: "Jigging", typeKey: "jigging", lat: 43.385, lon: 10.305, depth: "30-45", fondale: "Ciglio", tecnica: "Slow Pitch Jigging", description: "Falesia continua. 🆕 2025", zone: "Vada", distance_nm: 5.3, fascia: "media", difficulty: "facile", rating: 4, isFeature: false, isNew: true },
-        { id: "sp-4", name: "Scoglio Calafuria", type: "Jigging", typeKey: "jigging", lat: 43.405, lon: 10.308, depth: "35-50", fondale: "Scoglio", tecnica: "Slow Pitch Jigging", description: "Struttura rocciosa. 🆕 2025", zone: "Vada", distance_nm: 5.2, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: true },
-        { id: "sp-5", name: "Batteria Quercetano", type: "Jigging", typeKey: "jigging", lat: 43.368, lon: 10.320, depth: "38-48", fondale: "Reef", tecnica: "Slow Pitch Jigging", description: "Struttura artificiale. 🆕 2025", zone: "Vada", distance_nm: 4.9, fascia: "media", difficulty: "medio", rating: 4, isFeature: false, isNew: true },
-        { id: "sp-6", name: "Canale Quercetano", type: "Jigging", typeKey: "jigging", lat: 43.365, lon: 10.310, depth: "45-55", fondale: "Canale", tecnica: "Slow Pitch Jigging", description: "Canale tra secche. 🆕 2025", zone: "Vada", distance_nm: 5.4, fascia: "media", difficulty: "difficile", rating: 4, isFeature: false, isNew: true },
-        { id: "sp-7", name: "Margine Continentale", type: "Jigging", typeKey: "jigging", lat: 43.350, lon: 10.305, depth: "50-60", fondale: "Ciglio", tecnica: "Slow Pitch Jigging", description: "Margine piattaforma. 🆕 2025", zone: "Cecina", distance_nm: 5.9, fascia: "media", difficulty: "difficile", rating: 5, isFeature: false, isNew: true },
-        { id: "sp-8", name: "Secca Rossa", type: "Jigging", typeKey: "jigging", lat: 43.355, lon: 10.295, depth: "55-70", fondale: "Secca", tecnica: "Slow Pitch Jigging", description: "Profondo. 🆕 2025", zone: "Cecina", distance_nm: 6.2, fascia: "largo", difficulty: "molto difficile", rating: 5, isFeature: false, isNew: true },
+        {id:"porto", name:"Porto Cala de' Medici", type:"Porto", typeKey:"porto", lat:43.3945, lon:10.4264, depth:"N/A", fondale:"Porto", tecnica:"Base", description:"Marina di Rosignano", zone:"Centro", distance_nm:0, fascia:"costa", difficulty:"facile", rating:1, isNew:false},
+        {id:"faro-vada", name:"Faro di Vada", type:"Feature", typeKey:"varie", lat:43.32, lon:10.365, depth:"2-15", fondale:"Secca", tecnica:"Varie", description:"Secca segnalata", zone:"Centro", distance_nm:5.21, fascia:"media", difficulty:"facile", rating:3, isNew:false},
+        {id:"sperone-esterno", name:"Sperone di Fuori", type:"Feature", typeKey:"varie", lat:43.305, lon:10.30, depth:"39-52", fondale:"Reef", tecnica:"Varie", description:"Reef parallelo costa", zone:"Sud", distance_nm:7.7, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"sperone-testa", name:"Testa dello Sperone", type:"Feature", typeKey:"varie", lat:43.315, lon:10.31, depth:"34-48", fondale:"Reef", tecnica:"Varie", description:"Zona curva Sperone", zone:"Sud", distance_nm:6.97, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"sperone-interno", name:"Sperone di Dentro", type:"Feature", typeKey:"varie", lat:43.32, lon:10.32, depth:"36-48", fondale:"Reef", tecnica:"Varie", description:"Reef perpendicolare", zone:"Centro", distance_nm:6.45, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"muraglione", name:"Muraglione", type:"Feature", typeKey:"varie", lat:43.318, lon:10.34, depth:"22-48", fondale:"Ciglio", tecnica:"Varie", description:"Parete verticale", zone:"Sud", distance_nm:5.94, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"puntaccia", name:"Puntaccia", type:"Feature", typeKey:"varie", lat:43.295, lon:10.28, depth:"46-52", fondale:"Reef", tecnica:"Varie", description:"Scogliera ad arco", zone:"Sud", distance_nm:8.75, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"ciglio-terra", name:"Ciglio di Terra", type:"Feature", typeKey:"varie", lat:43.325, lon:10.35, depth:"34-48", fondale:"Ciglio", tecnica:"Varie", description:"Ciglio vicino costa", zone:"Centro", distance_nm:5.34, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"marmi", name:"I Marmi", type:"Feature", typeKey:"varie", lat:43.285, lon:10.26, depth:"50-80", fondale:"Secca", tecnica:"Varie", description:"Rocce profonde", zone:"Sud", distance_nm:9.8, fascia:"largo", difficulty:"molto difficile", rating:5, isNew:false},
+        {id:"genepesca", name:"Relitto Genepesca", type:"Feature", typeKey:"varie", lat:43.315, lon:10.35, depth:"20-30", fondale:"Relitto", tecnica:"Varie", description:"Motonave affondata", zone:"Sud", distance_nm:5.82, fascia:"media", difficulty:"medio", rating:5, isNew:false},
+        {id:"secca-calafuria", name:"Secca di Calafuria", type:"Feature", typeKey:"varie", lat:43.41, lon:10.30, depth:"18-52", fondale:"Secca", tecnica:"Varie", description:"Falesie arenaria", zone:"Nord", distance_nm:5.59, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"secca-romito", name:"Secca del Romito", type:"Feature", typeKey:"varie", lat:43.395, lon:10.295, depth:"25-45", fondale:"Secca", tecnica:"Varie", description:"Affioramento roccioso", zone:"Nord", distance_nm:5.73, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"scogli-sonnino", name:"Scogli del Sonnino", type:"Feature", typeKey:"varie", lat:43.435, lon:10.32, depth:"12-28", fondale:"Scoglio", tecnica:"Varie", description:"Prolungamento sommerso", zone:"Nord", distance_nm:5.24, fascia:"media", difficulty:"facile", rating:3, isNew:false},
+        {id:"secca-punta-righini", name:"Secca di Punta Righini", type:"Feature", typeKey:"varie", lat:43.395, lon:10.38, depth:"15-30", fondale:"Secca", tecnica:"Varie", description:"Prolungamento sommerso", zone:"Nord", distance_nm:2.02, fascia:"costa", difficulty:"facile", rating:3, isNew:false},
+        {id:"secca-quercetano", name:"Secca del Quercetano", type:"Feature", typeKey:"varie", lat:43.36, lon:10.30, depth:"20-38", fondale:"Secca", tecnica:"Varie", description:"Secca rocciosa", zone:"Centro", distance_nm:5.89, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"secca-lillatro", name:"Secca del Lillatro", type:"Feature", typeKey:"varie", lat:43.335, lon:10.32, depth:"18-35", fondale:"Secca", tecnica:"Varie", description:"Secca tra Rosignano e Vada", zone:"Centro", distance_nm:5.86, fascia:"media", difficulty:"medio", rating:3, isNew:false},
+        {id:"ciglio-cecina", name:"Ciglio di Cecina", type:"Feature", typeKey:"varie", lat:43.25, lon:10.30, depth:"30-55", fondale:"Ciglio", tecnica:"Varie", description:"Caduta netta", zone:"Sud", distance_nm:10.28, fascia:"largo", difficulty:"difficile", rating:5, isNew:false},
+        {id:"pre-testa-sperone-tenya", name:"Testa Sperone - Tenya", type:"Tenya", typeKey:"tenya", lat:43.315, lon:10.31, depth:"34-42", fondale:"Secca", tecnica:"Tenya", description:"Roccia compatta", zone:"Sud", distance_nm:6.97, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"pre-muraglione-tenya", name:"Muraglione - Tenya", type:"Tenya", typeKey:"tenya", lat:43.318, lon:10.34, depth:"22-48", fondale:"Ciglio", tecnica:"Tenya", description:"Parete verticale", zone:"Sud", distance_nm:5.94, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-ciglio-terra-tenya", name:"Ciglio di Terra - Tenya", type:"Tenya", typeKey:"tenya", lat:43.325, lon:10.35, depth:"34-48", fondale:"Ciglio", tecnica:"Tenya", description:"Ciglio vicino costa", zone:"Centro", distance_nm:5.34, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-calafuria-tenya", name:"Secca Calafuria - Tenya", type:"Tenya", typeKey:"tenya", lat:43.41, lon:10.30, depth:"18-52", fondale:"Misto", tecnica:"Tenya", description:"Falesie", zone:"Nord", distance_nm:5.59, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-sperone-interno-slow", name:"Sperone Interno - SP", type:"Jigging", typeKey:"jigging", lat:43.32, lon:10.32, depth:"36-48", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Reef", zone:"Centro", distance_nm:6.45, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"pre-sperone-fuori-slow", name:"Sperone di Fuori - SP", type:"Jigging", typeKey:"jigging", lat:43.305, lon:10.30, depth:"39-52", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Reef", zone:"Sud", distance_nm:7.7, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"pre-puntaccia-slow", name:"Puntaccia - SP", type:"Jigging", typeKey:"jigging", lat:43.295, lon:10.28, depth:"46-52", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"OLTRE 6nm!", zone:"Sud", distance_nm:8.75, fascia:"largo", difficulty:"difficile", rating:5, isNew:false},
+        {id:"pre-romito-slow", name:"Secca Romito - SP", type:"Jigging", typeKey:"jigging", lat:43.395, lon:10.295, depth:"25-45", fondale:"Roccioso", tecnica:"Slow Pitch Jigging", description:"Affioramento", zone:"Nord", distance_nm:5.73, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-quercetano-slow", name:"Secca Quercetano - SP", type:"Jigging", typeKey:"jigging", lat:43.36, lon:10.30, depth:"20-38", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Ciglio", zone:"Centro", distance_nm:5.89, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-ciglio-cecina", name:"Ciglio Cecina - SP", type:"Jigging", typeKey:"jigging", lat:43.25, lon:10.30, depth:"30-55", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Caduta", zone:"Sud", distance_nm:10.28, fascia:"largo", difficulty:"difficile", rating:5, isNew:false},
+        {id:"sp-1", name:"Lillatro SP", type:"Jigging", typeKey:"jigging", lat:43.340, lon:10.325, depth:"35-45", fondale:"Roccioso", tecnica:"Slow Pitch Jigging", description:"Transizione sabbia-roccia 🆕", zone:"Vada", distance_nm:5.5, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-2", name:"Banco Lillatro", type:"Jigging", typeKey:"jigging", lat:43.338, lon:10.315, depth:"40-50", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Banco roccioso 🆕", zone:"Vada", distance_nm:5.9, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-3", name:"Falesia Sommersa Nord", type:"Jigging", typeKey:"jigging", lat:43.385, lon:10.305, depth:"30-45", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Falesia continua 🆕", zone:"Vada", distance_nm:5.3, fascia:"media", difficulty:"facile", rating:4, isNew:true},
+        {id:"sp-4", name:"Scoglio Calafuria", type:"Jigging", typeKey:"jigging", lat:43.405, lon:10.308, depth:"35-50", fondale:"Scoglio", tecnica:"Slow Pitch Jigging", description:"Struttura rocciosa 🆕", zone:"Vada", distance_nm:5.2, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-5", name:"Batteria Quercetano", type:"Jigging", typeKey:"jigging", lat:43.368, lon:10.320, depth:"38-48", fondale:"Reef", tecnica:"Slow Pitch Jigging", description:"Struttura artificiale 🆕", zone:"Vada", distance_nm:4.9, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-6", name:"Canale Quercetano", type:"Jigging", typeKey:"jigging", lat:43.365, lon:10.310, depth:"45-55", fondale:"Canale", tecnica:"Slow Pitch Jigging", description:"Canale tra secche 🆕", zone:"Vada", distance_nm:5.4, fascia:"media", difficulty:"difficile", rating:4, isNew:true},
+        {id:"sp-7", name:"Margine Continentale", type:"Jigging", typeKey:"jigging", lat:43.350, lon:10.305, depth:"50-60", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Margine piattaforma 🆕", zone:"Cecina", distance_nm:5.9, fascia:"media", difficulty:"difficile", rating:5, isNew:true},
+        {id:"sp-8", name:"Secca Rossa", type:"Jigging", typeKey:"jigging", lat:43.355, lon:10.295, depth:"55-70", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Profondo 🆕", zone:"Cecina", distance_nm:6.2, fascia:"largo", difficulty:"molto difficile", rating:5, isNew:true},
     ];
 
+    // Distanze calcolate
     const SPOT_DISTANCES = {
-        "porto": { porto: 0.0, costa: 1.96, dir: "NE" },
-        "faro-vada": { porto: 5.21, costa: 3.00, dir: "SW" },
-        "sperone-esterno": { porto: 7.70, costa: 5.42, dir: "SW" },
-        "sperone-testa": { porto: 6.97, costa: 4.68, dir: "SW" },
-        "sperone-interno": { porto: 6.45, costa: 4.21, dir: "SW" },
-        "muraglione": { porto: 5.94, costa: 3.89, dir: "SW" },
-        "puntaccia": { porto: 8.75, costa: 6.37, dir: "SW" },
-        "ciglio-terra": { porto: 5.34, costa: 3.32, dir: "SW" },
-        "marmi": { porto: 9.80, costa: 7.31, dir: "SW" },
-        "genepesca": { porto: 5.82, costa: 3.71, dir: "SW" },
-        "secca-calafuria": { porto: 5.59, costa: 1.39, dir: "W" },
-        "secca-romito": { porto: 5.73, costa: 1.51, dir: "W" },
-        "scogli-sonnino": { porto: 5.24, costa: 1.09, dir: "W" },
-        "secca-punta-righini": { porto: 2.02, costa: 1.00, dir: "NE" },
-        "secca-quercetano": { porto: 5.89, costa: 2.60, dir: "SW" },
-        "secca-lillatro": { porto: 5.86, costa: 3.42, dir: "SW" },
-        "ciglio-cecina": { porto: 10.28, costa: 7.77, dir: "SW" },
-        "pre-testa-sperone-tenya": { porto: 6.97, costa: 4.68, dir: "SW" },
-        "pre-muraglione-tenya": { porto: 5.94, costa: 3.89, dir: "SW" },
-        "pre-ciglio-terra-tenya": { porto: 5.34, costa: 3.32, dir: "SW" },
-        "pre-calafuria-tenya": { porto: 5.59, costa: 1.39, dir: "W" },
-        "pre-sperone-interno-slow": { porto: 6.45, costa: 4.21, dir: "SW" },
-        "pre-sperone-fuori-slow": { porto: 7.70, costa: 5.42, dir: "SW" },
-        "pre-puntaccia-slow": { porto: 8.75, costa: 6.37, dir: "SW" },
-        "pre-romito-slow": { porto: 5.73, costa: 1.51, dir: "W" },
-        "pre-quercetano-slow": { porto: 5.89, costa: 2.60, dir: "SW" },
-        "pre-ciglio-cecina": { porto: 10.28, costa: 7.77, dir: "SW" },
-        "sp-1": { porto: 5.50, costa: 3.05, dir: "SW" },
-        "sp-2": { porto: 5.93, costa: 3.37, dir: "SW" },
-        "sp-3": { porto: 5.33, costa: 1.38, dir: "SW" },
-        "sp-4": { porto: 5.20, costa: 0.96, dir: "W" },
-        "sp-5": { porto: 4.91, costa: 1.68, dir: "SW" },
-        "sp-6": { porto: 5.38, costa: 2.08, dir: "SW" },
-        "sp-7": { porto: 5.93, costa: 2.95, dir: "SW" },
-        "sp-8": { porto: 6.21, costa: 2.97, dir: "SW" },
+        "porto": {porto:0, costa:1.96, dir:"NE"},
+        "faro-vada": {porto:5.21, costa:3.00, dir:"SW"},
+        "sperone-esterno": {porto:7.70, costa:5.42, dir:"SW"},
+        "sperone-testa": {porto:6.97, costa:4.68, dir:"SW"},
+        "sperone-interno": {porto:6.45, costa:4.21, dir:"SW"},
+        "muraglione": {porto:5.94, costa:3.89, dir:"SW"},
+        "puntaccia": {porto:8.75, costa:6.37, dir:"SW"},
+        "ciglio-terra": {porto:5.34, costa:3.32, dir:"SW"},
+        "marmi": {porto:9.80, costa:7.31, dir:"SW"},
+        "genepesca": {porto:5.82, costa:3.71, dir:"SW"},
+        "secca-calafuria": {porto:5.59, costa:1.39, dir:"W"},
+        "secca-romito": {porto:5.73, costa:1.51, dir:"W"},
+        "scogli-sonnino": {porto:5.24, costa:1.09, dir:"W"},
+        "secca-punta-righini": {porto:2.02, costa:1.00, dir:"NE"},
+        "secca-quercetano": {porto:5.89, costa:2.60, dir:"SW"},
+        "secca-lillatro": {porto:5.86, costa:3.42, dir:"SW"},
+        "ciglio-cecina": {porto:10.28, costa:7.77, dir:"SW"},
+        "pre-testa-sperone-tenya": {porto:6.97, costa:4.68, dir:"SW"},
+        "pre-muraglione-tenya": {porto:5.94, costa:3.89, dir:"SW"},
+        "pre-ciglio-terra-tenya": {porto:5.34, costa:3.32, dir:"SW"},
+        "pre-calafuria-tenya": {porto:5.59, costa:1.39, dir:"W"},
+        "pre-sperone-interno-slow": {porto:6.45, costa:4.21, dir:"SW"},
+        "pre-sperone-fuori-slow": {porto:7.70, costa:5.42, dir:"SW"},
+        "pre-puntaccia-slow": {porto:8.75, costa:6.37, dir:"SW"},
+        "pre-romito-slow": {porto:5.73, costa:1.51, dir:"W"},
+        "pre-quercetano-slow": {porto:5.89, costa:2.60, dir:"SW"},
+        "pre-ciglio-cecina": {porto:10.28, costa:7.77, dir:"SW"},
+        "sp-1": {porto:5.50, costa:3.05, dir:"SW"},
+        "sp-2": {porto:5.93, costa:3.37, dir:"SW"},
+        "sp-3": {porto:5.33, costa:1.38, dir:"SW"},
+        "sp-4": {porto:5.20, costa:0.96, dir:"W"},
+        "sp-5": {porto:4.91, costa:1.68, dir:"SW"},
+        "sp-6": {porto:5.38, costa:2.08, dir:"SW"},
+        "sp-7": {porto:5.93, costa:2.95, dir:"SW"},
+        "sp-8": {porto:6.21, costa:2.97, dir:"SW"},
     };
 
     // ============================================================
-    // MAP VARIABLES
+    // MAP
     // ============================================================
     let map, markers = [];
-    let activeFilters = { tenya: true, jigging: true, drifting: true, porto: true, varie: true, costa: true, media: true, largo: true };
+    let activeFilters = {tenya:true, jigging:true, drifting:true, porto:true, varie:true, costa:true, media:true, largo:true};
     let linee6nm, linee12nm, osmLayer, satelliteLayer;
 
-    // ============================================================
-    // INIT MAP
-    // ============================================================
     function initMap() {
         map = L.map('map').setView([43.35, 10.35], 11);
-        
-        osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 18 });
-        satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 18 });
+        osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:18});
+        satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution:'© Esri', maxZoom:18});
         osmLayer.addTo(map);
-        
         drawDistanceLines();
         addMarkers();
-        
-        // Fetch weather data
-        fetchWeatherData();
     }
     
     function drawDistanceLines() {
-        const costaCoords = [
-            [43.46, 10.36], [43.44, 10.35], [43.42, 10.34], [43.40, 10.33],
-            [43.38, 10.34], [43.36, 10.37], [43.34, 10.40], [43.32, 10.42],
-            [43.30, 10.45], [43.28, 10.47], [43.26, 10.49], [43.24, 10.51]
-        ];
-        
-        L.polyline(costaCoords, { color: '#27ae60', weight: 2, opacity: 0.6 }).bindPopup("🏖️ Costa Toscana").addTo(map);
-        
-        const coord6nm = costaCoords.map(([lat, lon]) => [lat, lon - 0.1]);
-        linee6nm = L.polyline(coord6nm, { color: '#e74c3c', weight: 3, dashArray: '10, 5', opacity: 0.8 })
-            .bindPopup("🚫 Linea 6 nm").addTo(map);
-        
-        const coord12nm = costaCoords.map(([lat, lon]) => [lat, lon - 0.2]);
-        linee12nm = L.polyline(coord12nm, { color: '#3498db', weight: 3, dashArray: '10, 5', opacity: 0.8 })
-            .bindPopup("🌊 Linea 12 nm").addTo(map);
+        const costa = [[43.46,10.36],[43.44,10.35],[43.42,10.34],[43.40,10.33],[43.38,10.34],[43.36,10.37],[43.34,10.40],[43.32,10.42],[43.30,10.45],[43.28,10.47],[43.26,10.49],[43.24,10.51]];
+        L.polyline(costa, {color:'#27ae60', weight:2, opacity:0.6}).bindPopup("🏖️ Costa").addTo(map);
+        linee6nm = L.polyline(costa.map(([l,t])=>[l, t-0.1]), {color:'#e74c3c', weight:3, dashArray:'10,5'}).bindPopup("6 nm").addTo(map);
+        linee12nm = L.polyline(costa.map(([l,t])=>[l, t-0.2]), {color:'#3498db', weight:3, dashArray:'10,5'}).bindPopup("12 nm").addTo(map);
     }
     
     function getMarkerColor(spot) {
         if (spot.isNew) return '#9b59b6';
-        const colors = { tenya: '#e74c3c', jigging: '#9b59b6', drifting: '#3498db', porto: '#27ae60', varie: '#95a5a6' };
-        return colors[spot.typeKey] || '#95a5a6';
-    }
-    
-    function getFasciaLabel(fascia) {
-        const labels = { costa: 'Costa (0-3 nm)', media: 'Media (3-6 nm)', largo: 'Largo (6-12 nm)' };
-        return labels[fascia] || fascia;
+        const c = {tenya:'#e74c3c', jigging:'#9b59b6', drifting:'#3498db', porto:'#27ae60', varie:'#95a5a6'};
+        return c[spot.typeKey] || '#95a5a6';
     }
     
     function createPopupContent(spot) {
+        const dist = SPOT_DISTANCES[spot.id] || {porto: spot.distance_nm, costa: '-', dir:''};
         const ratingStars = '⭐'.repeat(spot.rating);
-        const difficultyEmoji = spot.difficulty === 'facile' ? '😊' : spot.difficulty === 'medio' ? '😐' : '😰';
-        const typeColor = getMarkerColor(spot);
-        const fasciaColor = { costa: '#27ae60', media: '#f39c12', largo: '#3498db' }[spot.fascia] || '#95a5a6';
+        const diff = spot.difficulty === 'facile' ? '😊' : spot.difficulty === 'medio' ? '😐' : '😰';
+        const color = getMarkerColor(spot);
+        const fasciaColor = {costa:'#27ae60', media:'#f39c12', largo:'#3498db'}[spot.fascia] || '#95a5a6';
         
-        return `
-            <div class="spot-popup">
-                <div class="popup-header">
-                    <h2>${spot.name}${spot.isNew ? '<span class="new-badge">🆕 NUOVO</span>' : ''}</h2>
-                    <span class="type-badge" style="background:${typeColor}">${spot.type}</span>
-                </div>
-                <div class="popup-body">
-                    <div class="popup-row">
-                        <span class="popup-label">📍 Coordinate</span>
-                        <span class="popup-value">${spot.lat.toFixed(4)}, ${spot.lon.toFixed(4)}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">🌊 Profondità</span>
-                        <span class="popup-value depth">${spot.depth} m</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">🚢 Da Porto</span>
-                        <span class="popup-value nm">${SPOT_DISTANCES[spot.id]?.porto?.toFixed(2) || spot.distance_nm.toFixed(2)} nm</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">🏖️ Da Costa</span>
-                        <span class="popup-value nm">${SPOT_DISTANCES[spot.id]?.costa?.toFixed(2) || '-'} nm ${SPOT_DISTANCES[spot.id]?.dir || ''}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">📐 Fascia</span>
-                        <span class="popup-value" style="color:${fasciaColor}">${getFasciaLabel(spot.fascia)}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">🏖️ Fondale</span>
-                        <span class="popup-value">${spot.fondale}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">🎣 Tecnica</span>
-                        <span class="popup-value">${spot.tecnica}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">${difficultyEmoji} Difficoltà</span>
-                        <span class="popup-value">${spot.difficulty.charAt(0).toUpperCase() + spot.difficulty.slice(1)}</span>
-                    </div>
-                    <div class="popup-row">
-                        <span class="popup-label">⭐ Rating</span>
-                        <span class="popup-rating">${ratingStars}</span>
-                    </div>
-                </div>
-                <div class="popup-footer">${spot.description}</div>
+        return `<div class="spot-popup">
+            <div class="popup-header">
+                <h2>${spot.name}${spot.isNew ? '<span class="new-badge">🆕</span>' : ''}</h2>
+                <span class="type-badge" style="background:${color}">${spot.type}</span>
             </div>
-        `;
+            <div class="popup-body">
+                <div class="popup-row"><span class="popup-label">📍 Coordinate</span><span class="popup-value">${spot.lat.toFixed(4)}, ${spot.lon.toFixed(4)}</span></div>
+                <div class="popup-row"><span class="popup-label">🌊 Profondità</span><span class="popup-value depth">${spot.depth} m</span></div>
+                <div class="popup-row"><span class="popup-label">🚢 Da Porto</span><span class="popup-value nm">${dist.porto.toFixed(2)} nm</span></div>
+                <div class="popup-row"><span class="popup-label">🏖️ Da Costa</span><span class="popup-value nm">${typeof dist.costa === 'number' ? dist.costa.toFixed(2) : '-'} nm ${dist.dir}</span></div>
+                <div class="popup-row"><span class="popup-label">📐 Fascia</span><span class="popup-value" style="color:${fasciaColor}">${spot.fascia}</span></div>
+                <div class="popup-row"><span class="popup-label">🏖️ Fondale</span><span class="popup-value">${spot.fondale}</span></div>
+                <div class="popup-row"><span class="popup-label">🎣 Tecnica</span><span class="popup-value">${spot.tecnica}</span></div>
+                <div class="popup-row"><span class="popup-label">${diff} Difficoltà</span><span class="popup-value">${spot.difficulty}</span></div>
+                <div class="popup-row"><span class="popup-label">⭐ Rating</span><span class="popup-rating">${ratingStars}</span></div>
+            </div>
+            <div class="popup-footer">${spot.description}</div>
+        </div>`;
     }
     
     function shouldShowSpot(spot) {
@@ -1008,35 +796,25 @@
     function addMarkers() {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
-        
         SPOTS.forEach(spot => {
             const color = getMarkerColor(spot);
             const visible = shouldShowSpot(spot);
-            const borderColor = spot.isNew ? '#f39c12' : 'white';
-            const borderWidth = spot.isNew ? '3' : '2';
-            
+            const border = spot.isNew ? '#f39c12' : 'white';
             const icon = L.divIcon({
-                className: 'custom-marker',
-                html: `<div style="background:${color}; width:${spot.isFeature ? 16 : 18}px; height:${spot.isFeature ? 16 : 18}px; border-radius:${spot.type === 'Porto' ? '4px' : '50%'}; border:${borderWidth}px solid ${borderColor}; box-shadow:0 2px 5px rgba(0,0,0,0.3);"></div>`,
-                iconSize: [spot.isFeature ? 16 : 18, spot.isFeature ? 16 : 18],
-                iconAnchor: [spot.isFeature ? 8 : 9, spot.isFeature ? 8 : 9]
+                className:'custom-marker',
+                html: `<div style="background:${color}; width:16px; height:16px; border-radius:50%; border:2px solid ${border}; box-shadow:0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                iconSize:[16,16], iconAnchor:[8,8]
             });
-            
-            const marker = L.marker([spot.lat, spot.lon], { icon: icon, opacity: visible ? 1 : 0.2 })
-                .bindPopup(createPopupContent(spot));
+            const marker = L.marker([spot.lat, spot.lon], {icon, opacity: visible ? 1 : 0.2}).bindPopup(createPopupContent(spot));
             marker.addTo(map);
             markers.push(marker);
         });
-        
         updateCounter();
     }
     
     function updateCounter() {
         const visible = markers.filter(m => m.options.opacity === 1).length;
-        const counter = document.getElementById('spotCounter');
-        const mobileCounter = document.getElementById('spotCounterMobile');
-        if (counter) counter.textContent = `${visible}/${SPOTS.length}`;
-        if (mobileCounter) mobileCounter.textContent = `${visible}/${SPOTS.length} spot`;
+        document.getElementById('spotCounterNum').textContent = `${visible}/${SPOTS.length}`;
     }
     
     function toggleFilter(btn) {
@@ -1047,15 +825,14 @@
     }
     
     function resetFilters() {
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.add('active'));
-        activeFilters = { tenya: true, jigging: true, drifting: true, porto: true, varie: true, costa: true, media: true, largo: true };
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.add('active'));
+        activeFilters = {tenya:true, jigging:true, drifting:true, porto:true, varie:true, costa:true, media:true, largo:true};
         addMarkers();
         showToast('Filtri resettati');
     }
     
     function toggleLayer(layer) {
         const btn = event.target.closest('.layer-btn');
-        
         if (layer === 'linea6nm') {
             if (map.hasLayer(linee6nm)) { map.removeLayer(linee6nm); btn.classList.remove('active'); }
             else { linee6nm.addTo(map); btn.classList.add('active'); }
@@ -1063,65 +840,59 @@
             if (map.hasLayer(linee12nm)) { map.removeLayer(linee12nm); btn.classList.remove('active'); }
             else { linee12nm.addTo(map); btn.classList.add('active'); }
         } else if (layer === 'satellite') {
-            if (map.hasLayer(satelliteLayer)) { map.removeLayer(satelliteLayer); osmLayer.addTo(map); }
-            else { map.removeLayer(osmLayer); satelliteLayer.addTo(map); }
-            btn.classList.toggle('active');
+            if (map.hasLayer(satelliteLayer)) { map.removeLayer(satelliteLayer); osmLayer.addTo(map); btn.classList.remove('active'); }
+            else { map.removeLayer(osmLayer); satelliteLayer.addTo(map); btn.classList.add('active'); }
         }
     }
     
     function goToMyLocation() {
-        if (!navigator.geolocation) { showToast('Geolocalizzazione non disponibile'); return; }
+        if (!navigator.geolocation) { showToast('GPS non disponibile'); return; }
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
+            pos => {
                 map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-                L.circle([pos.coords.latitude, pos.coords.longitude], { color: '#27ae60', fillColor: '#27ae60', fillOpacity: 0.3, radius: 50 })
-                    .addTo(map).bindPopup('📍 La tua posizione');
-                showToast('Centrato sulla tua posizione');
+                L.circle([pos.coords.latitude, pos.coords.longitude], {color:'#27ae60', fillColor:'#27ae60', fillOpacity:0.3, radius:50}).addTo(map).bindPopup('📍 Tu');
+                showToast('Centrato');
             },
-            (err) => showToast('Errore: ' + err.message)
+            err => showToast('Errore GPS')
         );
     }
     
     function toggleMeasure() {
-        showToast('Clicca due punti per misurare');
+        showToast('Clicca due punti');
         let points = [];
-        
-        const clickHandler = (e) => {
+        const handler = e => {
             points.push(e.latlng);
             if (points.length === 1) L.marker(points[0]).addTo(map);
             else if (points.length === 2) {
                 L.marker(points[1]).addTo(map);
-                const line = L.polyline(points, { color: '#e67e22', weight: 3 }).addTo(map);
+                const line = L.polyline(points, {color:'#e67e22', weight:3}).addTo(map);
                 const R = 3440.065;
-                const dLat = (points[1].lat - points[0].lat) * Math.PI / 180;
-                const dLon = (points[1].lng - points[0].lng) * Math.PI / 180;
-                const a = Math.sin(dLat/2)**2 + Math.cos(points[0].lat * Math.PI / 180) * Math.cos(points[1].lat * Math.PI / 180) * Math.sin(dLon/2)**2;
+                const dLat = (points[1].lat - points[0].lat) * Math.PI/180;
+                const dLon = (points[1].lng - points[0].lng) * Math.PI/180;
+                const a = Math.sin(dLat/2)**2 + Math.cos(points[0].lat*Math.PI/180) * Math.cos(points[1].lat*Math.PI/180) * Math.sin(dLon/2)**2;
                 const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                L.popup().setLatLng(e.latlng).setContent(`📏 ${dist.toFixed(2)} nm (${(dist * 1.852).toFixed(2)} km)`).openOn(map);
+                L.popup().setLatLng(e.latlng).setContent(`📏 ${dist.toFixed(2)} nm (${(dist*1.852).toFixed(2)} km)`).openOn(map);
                 setTimeout(() => { map.removeLayer(line); points = []; }, 5000);
-                map.off('click', clickHandler);
+                map.off('click', handler);
             }
         };
-        map.on('click', clickHandler);
+        map.on('click', handler);
     }
     
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2500);
     }
     
     document.addEventListener('DOMContentLoaded', () => {
         initMap();
-        checkMobile();
+        fetchWeatherData();
     });
     
-    // Handle resize
-    window.addEventListener('resize', checkMobile);
-    
-    // Auto-refresh weather every 15 minutes
+    // Refresh weather every 15 min
     setInterval(fetchWeatherData, 15 * 60 * 1000);
     </script>
 </body>
