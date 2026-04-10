@@ -253,6 +253,56 @@
         .scale-bar-line { display: flex; align-items: center; gap: 4px; }
         .scale-bar-fill { height: 6px; background: #1F4E79; border-radius: 2px; }
         
+        /* ========== WEBCAM PANEL ========== */
+        .webcam-panel {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            width: 400px; max-width: calc(100vw - 20px);
+            background: #1e1e2e; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 1000;
+            overflow: hidden; font-size: 11px;
+        }
+        .webcam-header {
+            background: linear-gradient(90deg, #636e72, #b2bec3);
+            color: #0a0a0f; padding: 10px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .webcam-header h2 { font-size: 12px; margin: 0; font-weight: 600; }
+        .webcam-close {
+            background: rgba(0,0,0,0.2); border: none; color: #0a0a0f;
+            width: 22px; height: 22px; border-radius: 50%;
+            cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .webcam-container {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background: #000;
+        }
+        .webcam-container iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border: none;
+        }
+        .webcam-container img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .webcam-loading {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #666; text-align: center;
+        }
+        .webcam-footer {
+            padding: 6px 10px; text-align: center;
+            font-size: 8px; color: #555; border-top: 1px solid #333;
+        }
+        
+        /* ========== BATHYMETRY TOGGLE ========== */
+        .bathymetry-info {
+            position: fixed; bottom: 30px; left: 10px; 
+            background: rgba(26, 26, 46, 0.9); color: #74b9ff;
+            padding: 6px 10px; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000; font-size: 9px; display: none;
+        }
+        .bathymetry-info.visible { display: block; }
+        
         /* ========== POPUP ========== */
         .spot-popup { min-width: 260px; }
         .popup-header {
@@ -395,13 +445,32 @@
         </div>
     </div>
     
+    <!-- WEBCAM PANEL -->
+    <div class="webcam-panel" id="webcamPanel" style="display:none;">
+        <div class="webcam-header">
+            <h2>📷 Webcam Porto Cala de' Medici</h2>
+            <button class="webcam-close" onclick="hideWebcam()">×</button>
+        </div>
+        <div class="webcam-container" id="webcamContainer">
+            <div class="webcam-loading">Caricamento webcam...</div>
+        </div>
+        <div class="webcam-footer">Live view from Porto Turistico</div>
+    </div>
+    
+    <!-- BATHYMETRY INFO -->
+    <div class="bathymetry-info" id="bathymetryInfo">
+        🌊 Batimetria GEBCO 2024
+    </div>
+    
     <!-- LAYER CONTROLS -->
     <div class="layer-control">
         <div class="layer-btn active" onclick="toggleLayer('linea6nm')" title="6nm">6n</div>
         <div class="layer-btn active" onclick="toggleLayer('linea12nm')" title="12nm">12n</div>
+        <div class="layer-btn" onclick="toggleLayer('bathymetry')" title="Bathymetry">🌊</div>
         <div class="layer-btn" onclick="toggleLayer('satellite')" title="Satellite">🛰️</div>
         <div class="layer-btn" onclick="toggleWeather()" title="Meteo">🌊</div>
         <div class="layer-btn" onclick="toggleSidebar()" title="Spot">🗺️</div>
+        <div class="layer-btn" onclick="toggleWebcam()" title="Webcam">📷</div>
     </div>
     
     <!-- SCALE BAR -->
@@ -646,6 +715,111 @@
     }
 
     // ============================================================
+    // WEBCAM
+    // ============================================================
+    function hideWebcam() {
+        document.getElementById('webcamPanel').style.display = 'none';
+    }
+    
+    function toggleWebcam() {
+        const panel = document.getElementById('webcamPanel');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            loadWebcam();
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+    
+    function loadWebcam() {
+        const container = document.getElementById('webcamContainer');
+        // Try Windy webcam embed
+        container.innerHTML = `
+            <iframe 
+                src="https://embed.windy.com/embed2.html?lat=43.3945&lon=10.4264&zoom=12&type=cam&level=day&overlay=wind&product=bynder&camera=1529251791&message=true"
+                allowfullscreen
+                loading="lazy"
+                style="width:100%;height:100%;border:none;">
+            </iframe>
+        `;
+    }
+    
+    // ============================================================
+    // BATHYMETRY LAYER (GEBCO WMS)
+    // ============================================================
+    function createBathymetryLayer() {
+        // EMODnet WMS for bathymetry (more reliable)
+        return L.tileLayer.wms('https://ows.emodnet-bathymetry.eu/wms', {
+            layers: 'emodnet:mean_atlas_land',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.5,
+            attribution: '© EMODnet'
+        });
+    }
+    
+    // ============================================================
+    // BATHYMETRIC CONTOUR LINES
+    // ============================================================
+    function createBathymetryContours() {
+        // Approximate depth contours based on known fishing spots
+        // These are simplified representations of depth zones
+        const contours = [];
+        
+        // Shallow contour (20m) - near coast areas
+        contours.push(L.polyline([
+            [43.46, 10.36], [43.44, 10.35], [43.42, 10.33], [43.40, 10.32],
+            [43.38, 10.30], [43.36, 10.28], [43.34, 10.26], [43.32, 10.24],
+            [43.30, 10.22], [43.28, 10.20], [43.26, 10.18], [43.24, 10.16]
+        ], {
+            color: '#74b9ff',
+            weight: 1,
+            dashArray: '5,5',
+            opacity: 0.5
+        }).bindPopup('~20m depth'));
+        
+        // Medium contour (30-40m) - common fishing depth
+        contours.push(L.polyline([
+            [43.46, 10.33], [43.44, 10.31], [43.42, 10.29], [43.40, 10.27],
+            [43.38, 10.25], [43.36, 10.23], [43.34, 10.21], [43.32, 10.19],
+            [43.30, 10.17], [43.28, 10.15], [43.26, 10.13], [43.24, 10.11]
+        ], {
+            color: '#0984e3',
+            weight: 2,
+            dashArray: '8,4',
+            opacity: 0.6
+        }).bindPopup('~30-40m depth'));
+        
+        // Deep contour (50m+) - offshore fishing
+        contours.push(L.polyline([
+            [43.46, 10.28], [43.44, 10.26], [43.42, 10.24], [43.40, 10.22],
+            [43.38, 10.20], [43.36, 10.18], [43.34, 10.16], [43.32, 10.14],
+            [43.30, 10.12], [43.28, 10.10], [43.26, 10.08], [43.24, 10.06]
+        ], {
+            color: '#2d3436',
+            weight: 2,
+            dashArray: '12,4',
+            opacity: 0.7
+        }).bindPopup('~50m+ depth'));
+        
+        // Very deep contour (80m+) - deep sea
+        contours.push(L.polyline([
+            [43.44, 10.20], [43.42, 10.18], [43.40, 10.16], [43.38, 10.14],
+            [43.36, 10.12], [43.34, 10.10], [43.32, 10.08], [43.30, 10.06],
+            [43.28, 10.04], [43.26, 10.02], [43.24, 10.00]
+        ], {
+            color: '#000',
+            weight: 3,
+            dashArray: '15,5',
+            opacity: 0.8
+        }).bindPopup('~80m+ depth'));
+        
+        // Group all contours
+        const contourGroup = L.layerGroup(contours);
+        return contourGroup;
+    }
+    
+    // ============================================================
     // 35 SPOTS
     // ============================================================
     const SPOTS = [
@@ -730,12 +904,14 @@
     // ============================================================
     let map, markers = [];
     let activeFilters = {tenya:true, jigging:true, drifting:true, porto:true, varie:true, costa:true, media:true, largo:true};
-    let linee6nm, linee12nm, osmLayer, satelliteLayer;
+    let linee6nm, linee12nm, osmLayer, satelliteLayer, bathymetryLayer, contourLayer;
 
     function initMap() {
         map = L.map('map').setView([43.35, 10.35], 11);
         osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution:'© OpenStreetMap', maxZoom:18});
         satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution:'© Esri', maxZoom:18});
+        bathymetryLayer = createBathymetryLayer();
+        contourLayer = createBathymetryContours();
         osmLayer.addTo(map);
         drawDistanceLines();
         addMarkers();
@@ -839,6 +1015,20 @@
         } else if (layer === 'linea12nm') {
             if (map.hasLayer(linee12nm)) { map.removeLayer(linee12nm); btn.classList.remove('active'); }
             else { linee12nm.addTo(map); btn.classList.add('active'); }
+        } else if (layer === 'bathymetry') {
+            // Toggle both bathymetry WMS and contour lines together
+            const infoEl = document.getElementById('bathymetryInfo');
+            if (map.hasLayer(bathymetryLayer)) { 
+                map.removeLayer(bathymetryLayer); 
+                map.removeLayer(contourLayer);
+                btn.classList.remove('active');
+                infoEl.classList.remove('visible');
+            } else { 
+                bathymetryLayer.addTo(map); 
+                contourLayer.addTo(map);
+                btn.classList.add('active');
+                infoEl.classList.add('visible');
+            }
         } else if (layer === 'satellite') {
             if (map.hasLayer(satelliteLayer)) { map.removeLayer(satelliteLayer); osmLayer.addTo(map); btn.classList.remove('active'); }
             else { map.removeLayer(osmLayer); satelliteLayer.addTo(map); btn.classList.add('active'); }
