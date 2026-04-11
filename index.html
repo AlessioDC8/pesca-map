@@ -262,6 +262,52 @@
         }
         .bathymetry-info.visible { display: block; }
         
+        /* ========== VIDEO PANEL ========== */
+        .video-panel {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            width: 400px; max-width: calc(100vw - 20px);
+            background: #1e1e2e; border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 1000;
+            overflow: hidden; font-size: 11px;
+        }
+        .video-header {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            color: white; padding: 10px 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .video-header h2 { font-size: 12px; margin: 0; font-weight: 600; }
+        .video-header .status {
+            font-size: 10px; padding: 2px 8px; border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+        }
+        .video-container {
+            position: relative; width: 100%; aspect-ratio: 4/3;
+            background: #000;
+        }
+        .video-container img, .video-container iframe {
+            width: 100%; height: 100%; object-fit: cover; border: none;
+        }
+        .video-controls {
+            padding: 8px 12px; background: #252536;
+            display: flex; gap: 8px; align-items: center;
+        }
+        .video-controls input[type="text"] {
+            flex: 1; padding: 6px 10px; border: 1px solid #444;
+            border-radius: 6px; background: #1e1e2e; color: white;
+            font-size: 11px;
+        }
+        .video-controls button {
+            padding: 6px 12px; border: none; border-radius: 6px;
+            background: #00b894; color: white; cursor: pointer; font-size: 11px;
+        }
+        .video-controls button:hover { background: #00a884; }
+        .video-controls button.capture { background: #e74c3c; }
+        .video-controls button.capture:hover { background: #c0392b; }
+        .video-footer {
+            padding: 6px 10px; text-align: center;
+            font-size: 8px; color: #555; border-top: 1px solid #333;
+        }
+        
         /* ========== POPUP ========== */
         .spot-popup { min-width: 260px; }
         .popup-header {
@@ -409,6 +455,27 @@
         🌊 Batimetria GEBCO 2024
     </div>
     
+    <!-- VIDEO PANEL -->
+    <div class="video-panel" id="videoPanel" style="display:none;">
+        <div class="video-header">
+            <div>
+                <h2>📹 Camera di Bordo</h2>
+                <span class="status" id="videoStatus">Disconnesso</span>
+            </div>
+            <button class="webcam-close" onclick="hideVideo()">×</button>
+        </div>
+        <div class="video-container" id="videoContainer">
+            <img src="" id="videoStream" style="display:none;">
+            <img src="" id="photoCapture" style="display:none;">
+        </div>
+        <div class="video-controls">
+            <input type="text" id="videoUrl" placeholder="http://192.168.1.188" value="http://192.168.1.188">
+            <button onclick="startVideoStream()">▶️ Stream</button>
+            <button onclick="capturePhoto()" class="capture">📷 Foto</button>
+        </div>
+        <div class="video-footer">LetiBlu • Tieni premuto per salvare la foto</div>
+    </div>
+    
     <!-- LAYER CONTROLS -->
     <div class="layer-control">
         <div class="layer-btn active" onclick="toggleLayer('linea6nm')" title="6nm">6n</div>
@@ -417,6 +484,7 @@
         <div class="layer-btn" onclick="toggleLayer('openSeaMap')" title="OpenSeaMap">⚓</div>
         <div class="layer-btn" onclick="toggleLayer('satellite')" title="Satellite">🛰️</div>
         <div class="layer-btn" onclick="toggleWeather()" title="Meteo">🌊</div>
+        <div class="layer-btn" onclick="toggleVideo()" title="Video">📹</div>
         <div class="layer-btn" onclick="toggleSidebar()" title="Spot">🗺️</div>
     </div>
     
@@ -996,6 +1064,111 @@
         t.textContent = msg;
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 2500);
+    }
+    
+    // ==================== VIDEO CAMERA ====================
+    let videoStreamActive = false;
+    
+    function hideVideo() {
+        document.getElementById('videoPanel').style.display = 'none';
+        stopVideoStream();
+    }
+    
+    function toggleVideo() {
+        const panel = document.getElementById('videoPanel');
+        if (panel.style.display === 'none') {
+            panel.style.display = 'block';
+            // Auto-start stream if URL is set
+            const url = document.getElementById('videoUrl').value;
+            if (url) startVideoStream();
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+    
+    function startVideoStream() {
+        const url = document.getElementById('videoUrl').value.trim();
+        if (!url) {
+            showToast('Inserisci IP della camera');
+            return;
+        }
+        
+        const streamImg = document.getElementById('videoStream');
+        const captureImg = document.getElementById('photoCapture');
+        const status = document.getElementById('videoStatus');
+        
+        // Stop any previous stream
+        stopVideoStream();
+        
+        // Stream e' sulla porta 81!
+        streamImg.src = url + ':81/stream';
+        streamImg.style.display = 'block';
+        captureImg.style.display = 'none';
+        
+        streamImg.onload = function() {
+            status.textContent = '◉ In diretta';
+            status.style.background = '#27ae60';
+            videoStreamActive = true;
+        };
+        
+        streamImg.onerror = function() {
+            status.textContent = '❌ Errore';
+            status.style.background = '#e74c3c';
+            videoStreamActive = false;
+            showToast('Stream non disponibile');
+        };
+    }
+    
+    function capturePhoto() {
+        const url = document.getElementById('videoUrl').value.trim();
+        if (!url) {
+            showToast('Inserisci IP della camera');
+            return;
+        }
+        
+        const streamImg = document.getElementById('videoStream');
+        const captureImg = document.getElementById('photoCapture');
+        const status = document.getElementById('videoStatus');
+        
+        // Capture single image
+        const captureUrl = url + '/capture?' + Date.now();
+        captureImg.src = captureUrl;
+        captureImg.style.display = 'block';
+        streamImg.style.display = 'none';
+        
+        captureImg.onload = function() {
+            status.textContent = '📷 Foto';
+            status.style.background = '#f39c12';
+            showToast('Tocca a lungo per salvare!');
+            
+            // Long press to save
+            let pressTimer;
+            captureImg.onmousedown = () => {
+                pressTimer = setTimeout(() => {
+                    // Download image
+                    const a = document.createElement('a');
+                    a.href = captureUrl;
+                    a.download = 'LetiBlu_' + new Date().toISOString().slice(0,19).replace(/:/g,'-') + '.jpg';
+                    a.click();
+                    showToast('Foto scaricata!');
+                }, 800);
+            };
+            captureImg.onmouseup = () => clearTimeout(pressTimer);
+            captureImg.onmouseleave = () => clearTimeout(pressTimer);
+        };
+        
+        captureImg.onerror = function() {
+            status.textContent = '❌ Errore';
+            showToast('Camera non raggiungibile');
+        };
+    }
+    
+    function stopVideoStream() {
+        const streamImg = document.getElementById('videoStream');
+        streamImg.src = '';
+        streamImg.onload = null;
+        streamImg.onerror = null;
+        videoStreamActive = false;
     }
     
     document.addEventListener('DOMContentLoaded', () => {
