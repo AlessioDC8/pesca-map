@@ -224,15 +224,21 @@
             background: white; cursor: pointer; font-size: 9px;
         }
         .filter-btn.active { color: white; border-color: transparent; }
-        .filter-btn.tenya.active { background: #e74c3c; }
-        .filter-btn.jigging.active { background: #9b59b6; }
-        .filter-btn.drifting.active { background: #3498db; }
-        .filter-btn.porto.active { background: #27ae60; }
-        .filter-btn.varie.active { background: #95a5a6; }
+        .filter-btn.tenya.active { background: #c0392b; }
+        .filter-btn.slowpitch.active { background: #6c3483; }
+        .filter-btn.inchiku.active { background: #d35400; }
+        .filter-btn.drifting.active { background: #2471a3; }
+        .filter-btn.spinning.active { background: #16a085; }
+        .filter-btn.porto.active { background: #00b894; color: #0a0a0f; }
+        .filter-btn .flt-ico {
+            width: 16px; height: 16px; display: inline-flex; vertical-align: -3px; margin-right: 4px;
+        }
+        .filter-btn .flt-ico svg { width: 16px; height: 16px; display: block; }
         .filter-btn.costa.active { background: #27ae60; }
         .filter-btn.media.active { background: #f39c12; }
         .filter-btn.largo.active { background: #3498db; }
         .filter-btn.within6.active { background: #0c5460; color: #fff; }
+        .filter-btn.tutti.active { background: #1F4E79; color: #fff; }
         
         .legend { background: #f0f4f8; padding: 8px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #d5e0ea; }
         .legend h3 { font-size: 10px; margin-bottom: 6px; color: #1F4E79; }
@@ -323,14 +329,14 @@
             border: 1px solid rgba(116,185,255,0.35);
         }
         
-        /* ========== POPUP ========== */
-        .spot-popup { min-width: 260px; }
+        /* ========== POPUP / SHEET ========== */
+        .spot-popup { min-width: 0; width: 100%; font-size: 14px; line-height: 1.4; }
         .popup-header {
             background: linear-gradient(135deg, #1F4E79, #2E86AB);
-            color: white; padding: 10px; margin: -10px -10px 10px -10px;
-            border-radius: 8px 8px 0 0;
+            color: white; padding: 12px; margin: 0 0 10px 0;
+            border-radius: 10px;
         }
-        .popup-header h2 { font-size: 13px; margin-bottom: 4px; }
+        .popup-header h2 { font-size: 16px; margin-bottom: 4px; }
         .type-badge { 
             display: inline-block; padding: 2px 8px; border-radius: 10px; 
             font-size: 9px; text-transform: uppercase; 
@@ -341,8 +347,8 @@
         }
         .popup-body { padding: 5px 0; }
         .popup-row { 
-            display: flex; justify-content: space-between; padding: 4px 0; 
-            border-bottom: 1px solid #eee; font-size: 10px; 
+            display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; 
+            border-bottom: 1px solid #eee; font-size: 13px; 
         }
         .popup-row:last-child { border-bottom: none; }
         .popup-label { color: #666; }
@@ -352,7 +358,7 @@
         .popup-rating { color: #f39c12; font-size: 12px; }
         .popup-footer { 
             margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd; 
-            font-size: 9px; color: #666; 
+            font-size: 12px; color: #555; line-height: 1.4;
         }
         .popup-header.boat-header {
             background: linear-gradient(135deg, #00b894, #00cec9);
@@ -386,20 +392,64 @@
             100% { transform: scale(1.6); opacity: 0; }
         }
         .spot-list {
-            margin-top: 10px; max-height: 280px; overflow-y: auto;
+            margin-top: 6px; max-height: min(42vh, 380px); overflow-y: auto;
             border: 1px solid #e8eef3; border-radius: 8px;
+            -webkit-overflow-scrolling: touch; background: #fff;
+        }
+        .spot-list-section {
+            position: sticky; top: 0; z-index: 2; cursor: pointer;
+            background: #0f2433; color: #d7ecff; font-size: 10px; font-weight: 800;
+            padding: 8px 10px; text-transform: uppercase; letter-spacing: 0.3px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #2a4a63;
+        }
+        .spot-list-section.oltre { background: #3d2a12; }
+        .spot-list-tech {
+            position: sticky; top: 30px; z-index: 1;
+            background: #eef5fb; color: #1F4E79; font-size: 9px; font-weight: 800;
+            padding: 5px 10px; text-transform: uppercase; border-bottom: 1px solid #d5e4f0;
         }
         .spot-list-item {
             width: 100%; text-align: left; border: none; border-bottom: 1px solid #eee;
-            background: #fff; padding: 8px 10px; cursor: pointer;
-            display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center;
+            background: #fff; padding: 10px; cursor: pointer; min-height: 48px;
+            display: grid; grid-template-columns: 18px 1fr auto; gap: 8px; align-items: center;
         }
         .spot-list-item:last-child { border-bottom: none; }
         .spot-list-item:hover { background: #f3f8fc; }
         .spot-list-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .spot-list-name { font-size: 11px; font-weight: 600; color: #1F4E79; }
-        .spot-list-meta { font-size: 9px; color: #777; margin-top: 2px; }
-        .spot-list-dist { font-size: 10px; font-weight: 700; color: #00897B; }
+        .spot-list-name { font-size: 12px; font-weight: 600; color: #1F4E79; }
+        .spot-list-meta { font-size: 10px; color: #777; margin-top: 2px; }
+        .spot-list-dist { font-size: 11px; font-weight: 700; color: #00897B; }
+        .spot-list-empty { padding: 12px; font-size: 11px; color: #888; }
+        .filter-hint { font-size: 9px; color: #666; margin: 0 0 8px; line-height: 1.35; }
+        body:not(.zoom-labels) .depth-label { display: none !important; }
+
+        .spot-sheet {
+            position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(110%);
+            width: min(440px, calc(100vw - 12px));
+            max-height: min(68vh, 560px);
+            background: #fff; border-radius: 16px 16px 0 0;
+            box-shadow: 0 -8px 28px rgba(0,0,0,0.35);
+            z-index: 2200; display: flex; flex-direction: column;
+            transition: transform 0.22s ease; border: 1px solid #c9dceb;
+            visibility: hidden;
+        }
+        .spot-sheet.open { transform: translateX(-50%) translateY(0); visibility: visible; }
+        .spot-sheet-bar {
+            flex-shrink: 0; padding: 8px 12px 6px; display: flex; align-items: center; justify-content: center;
+            position: relative; border-bottom: 1px solid #e8eef4;
+        }
+        .spot-sheet-handle { width: 42px; height: 4px; border-radius: 4px; background: #c5d3e0; }
+        .spot-sheet-close {
+            position: absolute; right: 8px; top: 4px;
+            width: 40px; height: 40px; border: none; border-radius: 50%;
+            background: #eef5fb; color: #1F4E79; font-size: 22px; cursor: pointer; line-height: 1;
+        }
+        .spot-sheet-scroll {
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            padding: 10px 12px 20px; flex: 1; min-height: 0;
+        }
+        .spot-sheet-scroll .popup-actions button { min-height: 44px; font-size: 12px; }
         .action-btn.btn-boat { background: #00b894; color: #fff; }
         
 
@@ -549,8 +599,10 @@
             .layer-control { bottom: 20px; }
             .scale-bar { display: none; }
             
-            .spot-popup { min-width: 240px; }
-            .leaflet-popup-content { font-size: 12px; }
+            .spot-sheet { max-height: min(72vh, 620px); width: calc(100vw - 8px); border-radius: 14px 14px 0 0; }
+            .spot-list { max-height: min(38vh, 280px); }
+            .weather-panel, .sidebar { z-index: 2100; }
+            .leaflet-popup { display: none !important; }
         }
     </style>
 </head>
@@ -612,18 +664,22 @@
             </div>
             
             <div class="filter-section">
+                <h3>Tecnica verticale</h3>
+                <p class="filter-hint">Icona = tecnica. Una alla volta, oppure Tutti on/off insieme.</p>
+                <div class="filter-group">
+                    <button class="filter-btn tutti" data-filter="tutti" id="btnTuttiSpot" onclick="toggleAllSpots()" title="Attiva o disattiva tutte le tecniche insieme">◎ Tutti gli spot</button>
+                    <button class="filter-btn tenya active" data-filter="tenya" onclick="toggleFilter(this)"><span class="flt-ico" data-sym="tenya"></span>Tenya</button>
+                    <button class="filter-btn slowpitch" data-filter="slowpitch" onclick="toggleFilter(this)"><span class="flt-ico" data-sym="slowpitch"></span>Slow Pitch</button>
+                    <button class="filter-btn inchiku" data-filter="inchiku" onclick="toggleFilter(this)"><span class="flt-ico" data-sym="inchiku"></span>Inchiku</button>
+                    <button class="filter-btn drifting" data-filter="drifting" onclick="toggleFilter(this)"><span class="flt-ico" data-sym="drifting"></span>Drifting</button>
+                    <button class="filter-btn spinning" data-filter="spinning" onclick="toggleFilter(this)"><span class="flt-ico" data-sym="spinning"></span>Spinning</button>
+                    <button class="filter-btn porto active" data-filter="porto" onclick="toggleFilter(this)"><span class="flt-ico" data-sym="porto"></span>Porto</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
                 <h3>Elenco spot</h3>
                 <div class="spot-list" id="spotList"></div>
-            </div>
-            
-            <div class="filter-section">
-                <h3>Tecnica</h3>
-                <div class="filter-group">
-                    <button class="filter-btn tenya active" data-filter="tenya" onclick="toggleFilter(this)">🔴 Tenya</button>
-                    <button class="filter-btn jigging active" data-filter="jigging" onclick="toggleFilter(this)">🟣 Jigging</button>
-                    <button class="filter-btn drifting active" data-filter="drifting" onclick="toggleFilter(this)">🔵 Drifting</button>
-                    <button class="filter-btn porto active" data-filter="porto" onclick="toggleFilter(this)">🟢 Porto</button>
-                </div>
             </div>
             
             <div class="filter-section">
@@ -638,12 +694,11 @@
             
             <div class="legend">
                 <h3>Simbologia nautica</h3>
-                <div class="legend-item"><span class="legend-sym" id="legTenya"></span> Tenya</div>
-                <div class="legend-item"><span class="legend-sym" id="legJigging"></span> Slow Pitch / Jigging</div>
-                <div class="legend-item"><span class="legend-sym" id="legSecca"></span> Secca / Reef</div>
-                <div class="legend-item"><span class="legend-sym" id="legRelitto"></span> Relitto</div>
-                <div class="legend-item"><span class="legend-sym" id="legCiglio"></span> Ciglio / Caduta</div>
-                <div class="legend-item"><span class="legend-sym" id="legScoglio"></span> Scoglio</div>
+                <div class="legend-item"><span class="legend-sym" id="legTenya"></span> Tenya (triangolo)</div>
+                <div class="legend-item"><span class="legend-sym" id="legSlowpitch"></span> Slow Pitch (cerchio)</div>
+                <div class="legend-item"><span class="legend-sym" id="legInchiku"></span> Inchiku (esagono)</div>
+                <div class="legend-item"><span class="legend-sym" id="legDrifting"></span> Drifting (capsula)</div>
+                <div class="legend-item"><span class="legend-sym" id="legSpinning"></span> Spinning (stella)</div>
                 <div class="legend-item"><div class="legend-color" style="background:#00b894; border-radius:50%"></div> Base barca LetiBlu</div>
                 <div class="legend-item"><div class="legend-color" style="background:transparent; border:2px dashed #c0392b; border-radius:0"></div> Limite 6 nm</div>
                 <div class="legend-item"><div class="legend-color" style="background:transparent; border:2px dashed #2980b9; border-radius:0"></div> Limite 12 nm</div>
@@ -677,6 +732,15 @@
         Click sulla mappa = sondaggio profondità. Overlay seamark OpenSeaMap attivo.
     </div>
     
+    <!-- SPOT DETAIL SHEET -->
+    <div id="spotSheet" class="spot-sheet" aria-hidden="true">
+        <div class="spot-sheet-bar">
+            <div class="spot-sheet-handle"></div>
+            <button type="button" class="spot-sheet-close" onclick="closeSpotSheet()" aria-label="Chiudi">×</button>
+        </div>
+        <div class="spot-sheet-scroll" id="spotSheetBody"></div>
+    </div>
+
     <!-- LAYER CONTROLS -->
     <div class="layer-control">
         <div class="layer-btn active" onclick="toggleLayer('linea6nm')" title="6nm costa">6n</div>
@@ -1143,55 +1207,55 @@
     // ============================================================
     const SPOTS = window.SPOTS = [
         {id:"porto", name:"Porto Cala de' Medici", type:"Porto / Base barca", typeKey:"porto", lat:43.3945, lon:10.4264, depth:"0-4", fondale:"Porto", tecnica:"Ormeggio LetiBlu", description:"Base operativa barca LetiBlu — Marina di Rosignano / Cala de' Medici.", zone:"Centro", distance_nm:0.0, fascia:"costa", difficulty:"facile", rating:5, isNew:false, boat:"LetiBlu"},
-        {id:"bocca-cala", name:"Bocca di Porto Cala", type:"Feature", typeKey:"varie", lat:43.392, lon:10.418, depth:"4-12", fondale:"Misto", tecnica:"Spinning / traina leggera", description:"Uscita porto: spigola e sarago sulla diga. Ideale Haswing.", zone:"Centro", distance_nm:0.4, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
-        {id:"diga-sud-cala", name:"Diga Sud Cala", type:"Feature", typeKey:"varie", lat:43.388, lon:10.422, depth:"3-10", fondale:"Molo", tecnica:"Spinning", description:"Diga esterna sud — buono di notte / alba.", zone:"Centro", distance_nm:0.43, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"punta-romano", name:"Punta del Romano", type:"Feature", typeKey:"varie", lat:43.4, lon:10.4, depth:"8-22", fondale:"Scoglio", tecnica:"Varie", description:"Punta Castiglioncello, fondale misto.", zone:"Nord", distance_nm:1.2, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
-        {id:"baia-quercetano", name:"Baia del Quercetano", type:"Feature", typeKey:"varie", lat:43.378, lon:10.41, depth:"5-18", fondale:"Sabbia-roccia", tecnica:"Spinning / bolentino", description:"Baia riparata, buona con mare mosso.", zone:"Centro", distance_nm:1.22, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"scogli-castiglioncello", name:"Scogli Castiglioncello", type:"Feature", typeKey:"varie", lat:43.402, lon:10.395, depth:"6-20", fondale:"Scoglio", tecnica:"Varie", description:"Scogli a ridosso della costa.", zone:"Nord", distance_nm:1.44, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"secca-castiglioncello", name:"Secca Castiglioncello", type:"Feature", typeKey:"varie", lat:43.398, lon:10.385, depth:"12-28", fondale:"Secca", tecnica:"Tenya / bolentino", description:"Secca a ~1.8 nm — top per mezza giornata.", zone:"Nord", distance_nm:1.82, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
-        {id:"secca-punta-righini", name:"Secca di Punta Righini", type:"Feature", typeKey:"varie", lat:43.395, lon:10.38, depth:"15-30", fondale:"Secca", tecnica:"Varie", description:"Prolungamento sommerso vicino base.", zone:"Nord", distance_nm:2.02, fascia:"costa", difficulty:"facile", rating:3, isNew:false},
-        {id:"banco-rosignano", name:"Banco Rosignano", type:"Feature", typeKey:"varie", lat:43.37, lon:10.38, depth:"18-32", fondale:"Secca", tecnica:"Varie", description:"Banco sabbia-roccia SW dalla Cala.", zone:"Centro", distance_nm:2.5, fascia:"costa", difficulty:"medio", rating:4, isNew:true},
+        {id:"bocca-cala", name:"Bocca di Porto Cala", type:"Spinning", typeKey:"spinning", lat:43.392, lon:10.418, depth:"4-12", fondale:"Misto", tecnica:"Spinning", description:"Uscita porto: spigola e sarago sulla diga. Ideale Haswing.", zone:"Centro", distance_nm:0.4, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
+        {id:"diga-sud-cala", name:"Diga Sud Cala", type:"Spinning", typeKey:"spinning", lat:43.388, lon:10.422, depth:"3-10", fondale:"Molo", tecnica:"Spinning", description:"Diga esterna sud — buono di notte / alba.", zone:"Centro", distance_nm:0.43, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"punta-romano", name:"Punta del Romano", type:"Spinning", typeKey:"spinning", lat:43.4, lon:10.4, depth:"8-22", fondale:"Scoglio", tecnica:"Spinning", description:"Punta Castiglioncello, fondale misto.", zone:"Nord", distance_nm:1.2, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
+        {id:"baia-quercetano", name:"Baia del Quercetano", type:"Spinning", typeKey:"spinning", lat:43.378, lon:10.41, depth:"5-18", fondale:"Sabbia-roccia", tecnica:"Spinning / bolentino", description:"Baia riparata, buona con mare mosso.", zone:"Centro", distance_nm:1.22, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"scogli-castiglioncello", name:"Scogli Castiglioncello", type:"Spinning", typeKey:"spinning", lat:43.402, lon:10.395, depth:"6-20", fondale:"Scoglio", tecnica:"Spinning", description:"Scogli a ridosso della costa.", zone:"Nord", distance_nm:1.44, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"secca-castiglioncello", name:"Secca Castiglioncello", type:"Tenya", typeKey:"tenya", lat:43.398, lon:10.385, depth:"12-28", fondale:"Secca", tecnica:"Tenya", description:"Secca a ~1.8 nm — top per mezza giornata.", zone:"Nord", distance_nm:1.82, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
+        {id:"secca-punta-righini", name:"Secca di Punta Righini", type:"Tenya", typeKey:"tenya", lat:43.395, lon:10.38, depth:"15-30", fondale:"Secca", tecnica:"Tenya", description:"Prolungamento sommerso vicino base.", zone:"Nord", distance_nm:2.02, fascia:"costa", difficulty:"facile", rating:3, isNew:false},
+        {id:"banco-rosignano", name:"Banco Rosignano", type:"Tenya", typeKey:"tenya", lat:43.37, lon:10.38, depth:"18-32", fondale:"Secca", tecnica:"Tenya", description:"Banco sabbia-roccia SW dalla Cala.", zone:"Centro", distance_nm:2.5, fascia:"costa", difficulty:"medio", rating:4, isNew:true},
         {id:"drift-cala-sud", name:"Drift Cala Sud", type:"Drifting", typeKey:"drifting", lat:43.375, lon:10.39, depth:"20-35", fondale:"Misto", tecnica:"Drifting", description:"Deriva corta con Haswing — orate/pagelli.", zone:"Centro", distance_nm:1.97, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
         {id:"tenya-righini", name:"Punta Righini - Tenya", type:"Tenya", typeKey:"tenya", lat:43.392, lon:10.37, depth:"18-30", fondale:"Secca", tecnica:"Tenya", description:"Tenya vicino costa, controderiva Haswing.", zone:"Nord", distance_nm:2.47, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
-        {id:"ciglio-castiglioncello", name:"Ciglio Castiglioncello", type:"Feature", typeKey:"varie", lat:43.39, lon:10.36, depth:"25-40", fondale:"Ciglio", tecnica:"Varie", description:"Primo ciglio utile a ~3 nm.", zone:"Nord", distance_nm:2.91, fascia:"costa", difficulty:"medio", rating:4, isNew:true},
-        {id:"lillatro-costa", name:"Lillatro Costa", type:"Feature", typeKey:"varie", lat:43.355, lon:10.4, depth:"10-25", fondale:"Secca", tecnica:"Varie", description:"Lillatro lato costa, facile da raggiungere.", zone:"Vada", distance_nm:2.64, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"vada-secca-costa", name:"Secca Vada Costa", type:"Feature", typeKey:"varie", lat:43.345, lon:10.42, depth:"8-22", fondale:"Secca", tecnica:"Varie", description:"Secca davanti Vada entro 3 nm.", zone:"Vada", distance_nm:2.99, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"vada-diga", name:"Diga / Faro Vada costa", type:"Feature", typeKey:"varie", lat:43.353, lon:10.455, depth:"2-12", fondale:"Molo", tecnica:"Spinning", description:"Zona diga Vada — spigola.", zone:"Vada", distance_nm:2.79, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"faro-vada", name:"Faro di Vada", type:"Feature", typeKey:"varie", lat:43.33, lon:10.39, depth:"2-15", fondale:"Secca", tecnica:"Varie", description:"Secca faro, spostata più sotto costa (<6 nm).", zone:"Centro", distance_nm:4.19, fascia:"media", difficulty:"facile", rating:3, isNew:false},
-        {id:"quercianella-scogli", name:"Scogli Quercianella", type:"Feature", typeKey:"varie", lat:43.42, lon:10.38, depth:"10-25", fondale:"Scoglio", tecnica:"Varie", description:"Nord verso Quercianella.", zone:"Nord", distance_nm:2.54, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
-        {id:"calafuria-costa", name:"Calafuria Costa", type:"Feature", typeKey:"varie", lat:43.425, lon:10.36, depth:"12-30", fondale:"Falesia", tecnica:"Varie", description:"Falesie più vicine, buona con Haswing.", zone:"Nord", distance_nm:3.43, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"sonnino-interno", name:"Sonnino Interno", type:"Feature", typeKey:"varie", lat:43.43, lon:10.35, depth:"10-24", fondale:"Scoglio", tecnica:"Varie", description:"Prolungamento Sonnino lato terra.", zone:"Nord", distance_nm:3.96, fascia:"media", difficulty:"facile", rating:3, isNew:true},
-        {id:"gabbro-secche", name:"Secche del Gabbro", type:"Feature", typeKey:"varie", lat:43.36, lon:10.36, depth:"15-30", fondale:"Secca", tecnica:"Varie", description:"Tra Rosignano e Lillatro.", zone:"Centro", distance_nm:3.56, fascia:"media", difficulty:"medio", rating:3, isNew:true},
-        {id:"relitto-rosignano", name:"Struttura Rosignano", type:"Feature", typeKey:"varie", lat:43.372, lon:10.35, depth:"22-38", fondale:"Misto", tecnica:"Varie", description:"Anomalia/struttura da marcare su Elite DSI.", zone:"Centro", distance_nm:3.6, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"parete-romito-est", name:"Romito Est", type:"Feature", typeKey:"varie", lat:43.4, lon:10.33, depth:"20-38", fondale:"Roccioso", tecnica:"Varie", description:"Parete Romito spostata est (entro 6 nm).", zone:"Nord", distance_nm:4.22, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"scogli-sonnino", name:"Scogli del Sonnino", type:"Feature", typeKey:"varie", lat:43.435, lon:10.32, depth:"12-28", fondale:"Scoglio", tecnica:"Varie", description:"Prolungamento sommerso.", zone:"Nord", distance_nm:5.24, fascia:"media", difficulty:"facile", rating:3, isNew:false},
-        {id:"secca-calafuria", name:"Secca di Calafuria", type:"Feature", typeKey:"varie", lat:43.41, lon:10.3, depth:"18-52", fondale:"Secca", tecnica:"Varie", description:"Falesie arenaria.", zone:"Nord", distance_nm:5.59, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"secca-romito", name:"Secca del Romito", type:"Feature", typeKey:"varie", lat:43.395, lon:10.295, depth:"25-45", fondale:"Secca", tecnica:"Varie", description:"Affioramento roccioso.", zone:"Nord", distance_nm:5.73, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"ciglio-terra", name:"Ciglio di Terra", type:"Feature", typeKey:"varie", lat:43.325, lon:10.35, depth:"34-48", fondale:"Ciglio", tecnica:"Varie", description:"Ciglio vicino costa Vada.", zone:"Centro", distance_nm:5.34, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"muraglione", name:"Muraglione", type:"Feature", typeKey:"varie", lat:43.318, lon:10.34, depth:"22-48", fondale:"Ciglio", tecnica:"Varie", description:"Parete verticale.", zone:"Sud", distance_nm:5.94, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"genepesca", name:"Relitto Genepesca", type:"Feature", typeKey:"varie", lat:43.315, lon:10.35, depth:"20-30", fondale:"Relitto", tecnica:"Varie", description:"Motonave affondata — marca GO7/Elite.", zone:"Sud", distance_nm:5.82, fascia:"media", difficulty:"medio", rating:5, isNew:false},
-        {id:"secca-lillatro", name:"Secca del Lillatro", type:"Feature", typeKey:"varie", lat:43.335, lon:10.32, depth:"18-35", fondale:"Secca", tecnica:"Varie", description:"Secca tra Rosignano e Vada.", zone:"Centro", distance_nm:5.86, fascia:"media", difficulty:"medio", rating:3, isNew:false},
-        {id:"secca-quercetano", name:"Secca del Quercetano", type:"Feature", typeKey:"varie", lat:43.36, lon:10.3, depth:"20-38", fondale:"Secca", tecnica:"Varie", description:"Secca rocciosa.", zone:"Centro", distance_nm:5.89, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"sperone-interno", name:"Sperone di Dentro", type:"Feature", typeKey:"varie", lat:43.325, lon:10.335, depth:"32-45", fondale:"Reef", tecnica:"Varie", description:"Reef portato entro 6 nm (lato E).", zone:"Centro", distance_nm:5.77, fascia:"media", difficulty:"difficile", rating:4, isNew:false},
-        {id:"sp-1", name:"Lillatro SP", type:"Jigging", typeKey:"jigging", lat:43.34, lon:10.325, depth:"35-45", fondale:"Roccioso", tecnica:"Slow Pitch Jigging", description:"Transizione sabbia-roccia.", zone:"Vada", distance_nm:5.5, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"sp-2", name:"Banco Lillatro", type:"Jigging", typeKey:"jigging", lat:43.338, lon:10.315, depth:"40-50", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Banco roccioso.", zone:"Vada", distance_nm:5.93, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"sp-3", name:"Falesia Sommersa Nord", type:"Jigging", typeKey:"jigging", lat:43.385, lon:10.305, depth:"30-45", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Falesia continua.", zone:"Vada", distance_nm:5.33, fascia:"media", difficulty:"facile", rating:4, isNew:true},
-        {id:"sp-4", name:"Scoglio Calafuria", type:"Jigging", typeKey:"jigging", lat:43.405, lon:10.308, depth:"35-50", fondale:"Scoglio", tecnica:"Slow Pitch Jigging", description:"Struttura rocciosa.", zone:"Nord", distance_nm:5.2, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"sp-5", name:"Batteria Quercetano", type:"Jigging", typeKey:"jigging", lat:43.368, lon:10.32, depth:"38-48", fondale:"Reef", tecnica:"Slow Pitch Jigging", description:"Struttura artificiale.", zone:"Vada", distance_nm:4.91, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"sp-6", name:"Canale Quercetano", type:"Jigging", typeKey:"jigging", lat:43.365, lon:10.31, depth:"45-55", fondale:"Canale", tecnica:"Slow Pitch Jigging", description:"Canale tra secche.", zone:"Vada", distance_nm:5.38, fascia:"media", difficulty:"difficile", rating:4, isNew:true},
-        {id:"sp-7", name:"Margine Piattaforma", type:"Jigging", typeKey:"jigging", lat:43.35, lon:10.305, depth:"50-60", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Margine piattaforma entro 6 nm.", zone:"Cecina", distance_nm:5.93, fascia:"media", difficulty:"difficile", rating:5, isNew:true},
-        {id:"sp-8", name:"Secca Rossa", type:"Jigging", typeKey:"jigging", lat:43.358, lon:10.31, depth:"48-62", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Secca portata entro 6 nm.", zone:"Cecina", distance_nm:5.53, fascia:"media", difficulty:"difficile", rating:5, isNew:true},
+        {id:"ciglio-castiglioncello", name:"Ciglio Castiglioncello", type:"Inchiku", typeKey:"inchiku", lat:43.39, lon:10.36, depth:"25-40", fondale:"Ciglio", tecnica:"Inchiku", description:"Primo ciglio utile a ~3 nm.", zone:"Nord", distance_nm:2.91, fascia:"costa", difficulty:"medio", rating:4, isNew:true},
+        {id:"lillatro-costa", name:"Lillatro Costa", type:"Tenya", typeKey:"tenya", lat:43.355, lon:10.4, depth:"10-25", fondale:"Secca", tecnica:"Tenya", description:"Lillatro lato costa, facile da raggiungere.", zone:"Vada", distance_nm:2.64, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"vada-secca-costa", name:"Secca Vada Costa", type:"Tenya", typeKey:"tenya", lat:43.345, lon:10.42, depth:"8-22", fondale:"Secca", tecnica:"Tenya", description:"Secca davanti Vada entro 3 nm.", zone:"Vada", distance_nm:2.99, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"vada-diga", name:"Diga / Faro Vada costa", type:"Spinning", typeKey:"spinning", lat:43.353, lon:10.455, depth:"2-12", fondale:"Molo", tecnica:"Spinning", description:"Zona diga Vada — spigola.", zone:"Vada", distance_nm:2.79, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"faro-vada", name:"Faro di Vada", type:"Tenya", typeKey:"tenya", lat:43.33, lon:10.39, depth:"2-15", fondale:"Secca", tecnica:"Tenya", description:"Secca faro, spostata più sotto costa (<6 nm).", zone:"Centro", distance_nm:4.19, fascia:"media", difficulty:"facile", rating:3, isNew:false},
+        {id:"quercianella-scogli", name:"Scogli Quercianella", type:"Spinning", typeKey:"spinning", lat:43.42, lon:10.38, depth:"10-25", fondale:"Scoglio", tecnica:"Spinning", description:"Nord verso Quercianella.", zone:"Nord", distance_nm:2.54, fascia:"costa", difficulty:"facile", rating:3, isNew:true},
+        {id:"calafuria-costa", name:"Calafuria Costa", type:"Spinning", typeKey:"spinning", lat:43.425, lon:10.36, depth:"12-30", fondale:"Falesia", tecnica:"Spinning", description:"Falesie più vicine, buona con Haswing.", zone:"Nord", distance_nm:3.43, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sonnino-interno", name:"Sonnino Interno", type:"Spinning", typeKey:"spinning", lat:43.43, lon:10.35, depth:"10-24", fondale:"Scoglio", tecnica:"Spinning", description:"Prolungamento Sonnino lato terra.", zone:"Nord", distance_nm:3.96, fascia:"media", difficulty:"facile", rating:3, isNew:true},
+        {id:"gabbro-secche", name:"Secche del Gabbro", type:"Tenya", typeKey:"tenya", lat:43.36, lon:10.36, depth:"15-30", fondale:"Secca", tecnica:"Tenya", description:"Tra Rosignano e Lillatro.", zone:"Centro", distance_nm:3.56, fascia:"media", difficulty:"medio", rating:3, isNew:true},
+        {id:"relitto-rosignano", name:"Struttura Rosignano", type:"Inchiku", typeKey:"inchiku", lat:43.372, lon:10.35, depth:"22-38", fondale:"Misto", tecnica:"Inchiku", description:"Anomalia/struttura da marcare su Elite DSI.", zone:"Centro", distance_nm:3.6, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"parete-romito-est", name:"Romito Est", type:"Inchiku", typeKey:"inchiku", lat:43.4, lon:10.33, depth:"20-38", fondale:"Roccioso", tecnica:"Inchiku", description:"Parete Romito spostata est (entro 6 nm).", zone:"Nord", distance_nm:4.22, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"scogli-sonnino", name:"Scogli del Sonnino", type:"Spinning", typeKey:"spinning", lat:43.435, lon:10.32, depth:"12-28", fondale:"Scoglio", tecnica:"Spinning", description:"Prolungamento sommerso.", zone:"Nord", distance_nm:5.24, fascia:"media", difficulty:"facile", rating:3, isNew:false},
+        {id:"secca-calafuria", name:"Secca di Calafuria", type:"Inchiku", typeKey:"inchiku", lat:43.41, lon:10.3, depth:"18-52", fondale:"Secca", tecnica:"Inchiku", description:"Falesie arenaria.", zone:"Nord", distance_nm:5.59, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"secca-romito", name:"Secca del Romito", type:"Inchiku", typeKey:"inchiku", lat:43.395, lon:10.295, depth:"25-45", fondale:"Secca", tecnica:"Inchiku", description:"Affioramento roccioso.", zone:"Nord", distance_nm:5.73, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"ciglio-terra", name:"Ciglio di Terra", type:"Inchiku", typeKey:"inchiku", lat:43.325, lon:10.35, depth:"34-48", fondale:"Ciglio", tecnica:"Inchiku", description:"Ciglio vicino costa Vada.", zone:"Centro", distance_nm:5.34, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"muraglione", name:"Muraglione", type:"Inchiku", typeKey:"inchiku", lat:43.318, lon:10.34, depth:"22-48", fondale:"Ciglio", tecnica:"Inchiku", description:"Parete verticale.", zone:"Sud", distance_nm:5.94, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"genepesca", name:"Relitto Genepesca", type:"Slow Pitch", typeKey:"slowpitch", lat:43.315, lon:10.35, depth:"20-30", fondale:"Relitto", tecnica:"Slow Pitch Jigging", description:"Motonave affondata — marca GO7/Elite.", zone:"Sud", distance_nm:5.82, fascia:"media", difficulty:"medio", rating:5, isNew:false},
+        {id:"secca-lillatro", name:"Secca del Lillatro", type:"Inchiku", typeKey:"inchiku", lat:43.335, lon:10.32, depth:"18-35", fondale:"Secca", tecnica:"Inchiku", description:"Secca tra Rosignano e Vada.", zone:"Centro", distance_nm:5.86, fascia:"media", difficulty:"medio", rating:3, isNew:false},
+        {id:"secca-quercetano", name:"Secca del Quercetano", type:"Inchiku", typeKey:"inchiku", lat:43.36, lon:10.3, depth:"20-38", fondale:"Secca", tecnica:"Inchiku", description:"Secca rocciosa.", zone:"Centro", distance_nm:5.89, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"sperone-interno", name:"Sperone di Dentro", type:"Inchiku", typeKey:"inchiku", lat:43.325, lon:10.335, depth:"32-45", fondale:"Reef", tecnica:"Inchiku", description:"Reef portato entro 6 nm (lato E).", zone:"Centro", distance_nm:5.77, fascia:"media", difficulty:"difficile", rating:4, isNew:false},
+        {id:"sp-1", name:"Lillatro SP", type:"Slow Pitch", typeKey:"slowpitch", lat:43.34, lon:10.325, depth:"35-45", fondale:"Roccioso", tecnica:"Slow Pitch Jigging", description:"Transizione sabbia-roccia.", zone:"Vada", distance_nm:5.5, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-2", name:"Banco Lillatro", type:"Slow Pitch", typeKey:"slowpitch", lat:43.338, lon:10.315, depth:"40-50", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Banco roccioso.", zone:"Vada", distance_nm:5.93, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-3", name:"Falesia Sommersa Nord", type:"Slow Pitch", typeKey:"slowpitch", lat:43.385, lon:10.305, depth:"30-45", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Falesia continua.", zone:"Vada", distance_nm:5.33, fascia:"media", difficulty:"facile", rating:4, isNew:true},
+        {id:"sp-4", name:"Scoglio Calafuria", type:"Slow Pitch", typeKey:"slowpitch", lat:43.405, lon:10.308, depth:"35-50", fondale:"Scoglio", tecnica:"Slow Pitch Jigging", description:"Struttura rocciosa.", zone:"Nord", distance_nm:5.2, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-5", name:"Batteria Quercetano", type:"Slow Pitch", typeKey:"slowpitch", lat:43.368, lon:10.32, depth:"38-48", fondale:"Reef", tecnica:"Slow Pitch Jigging", description:"Struttura artificiale.", zone:"Vada", distance_nm:4.91, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sp-6", name:"Canale Quercetano", type:"Slow Pitch", typeKey:"slowpitch", lat:43.365, lon:10.31, depth:"45-55", fondale:"Canale", tecnica:"Slow Pitch Jigging", description:"Canale tra secche.", zone:"Vada", distance_nm:5.38, fascia:"media", difficulty:"difficile", rating:4, isNew:true},
+        {id:"sp-7", name:"Margine Piattaforma", type:"Slow Pitch", typeKey:"slowpitch", lat:43.35, lon:10.305, depth:"50-60", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"Margine piattaforma entro 6 nm.", zone:"Cecina", distance_nm:5.93, fascia:"media", difficulty:"difficile", rating:5, isNew:true},
+        {id:"sp-8", name:"Secca Rossa", type:"Slow Pitch", typeKey:"slowpitch", lat:43.358, lon:10.31, depth:"48-62", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"Secca portata entro 6 nm.", zone:"Cecina", distance_nm:5.53, fascia:"media", difficulty:"difficile", rating:5, isNew:true},
         {id:"pre-muraglione-tenya", name:"Muraglione - Tenya", type:"Tenya", typeKey:"tenya", lat:43.318, lon:10.34, depth:"22-48", fondale:"Ciglio", tecnica:"Tenya", description:"Tenya su parete.", zone:"Sud", distance_nm:5.94, fascia:"media", difficulty:"medio", rating:4, isNew:false},
         {id:"pre-ciglio-terra-tenya", name:"Ciglio di Terra - Tenya", type:"Tenya", typeKey:"tenya", lat:43.325, lon:10.35, depth:"34-48", fondale:"Ciglio", tecnica:"Tenya", description:"Tenya ciglio.", zone:"Centro", distance_nm:5.34, fascia:"media", difficulty:"medio", rating:4, isNew:false},
         {id:"pre-calafuria-tenya", name:"Secca Calafuria - Tenya", type:"Tenya", typeKey:"tenya", lat:43.41, lon:10.3, depth:"18-52", fondale:"Misto", tecnica:"Tenya", description:"Tenya falesie.", zone:"Nord", distance_nm:5.59, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"pre-romito-slow", name:"Secca Romito - SP", type:"Jigging", typeKey:"jigging", lat:43.395, lon:10.295, depth:"25-45", fondale:"Roccioso", tecnica:"Slow Pitch Jigging", description:"SPJ affioramento.", zone:"Nord", distance_nm:5.73, fascia:"media", difficulty:"medio", rating:4, isNew:false},
-        {id:"pre-quercetano-slow", name:"Secca Quercetano - SP", type:"Jigging", typeKey:"jigging", lat:43.36, lon:10.3, depth:"20-38", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"SPJ ciglio.", zone:"Centro", distance_nm:5.89, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-romito-slow", name:"Secca Romito - SP", type:"Slow Pitch", typeKey:"slowpitch", lat:43.395, lon:10.295, depth:"25-45", fondale:"Roccioso", tecnica:"Slow Pitch Jigging", description:"SPJ affioramento.", zone:"Nord", distance_nm:5.73, fascia:"media", difficulty:"medio", rating:4, isNew:false},
+        {id:"pre-quercetano-slow", name:"Secca Quercetano - SP", type:"Slow Pitch", typeKey:"slowpitch", lat:43.36, lon:10.3, depth:"20-38", fondale:"Ciglio", tecnica:"Slow Pitch Jigging", description:"SPJ ciglio.", zone:"Centro", distance_nm:5.89, fascia:"media", difficulty:"medio", rating:4, isNew:false},
         {id:"tenya-castiglioncello", name:"Castiglioncello - Tenya", type:"Tenya", typeKey:"tenya", lat:43.396, lon:10.375, depth:"16-28", fondale:"Secca", tecnica:"Tenya", description:"Tenya classica sotto Castiglioncello.", zone:"Nord", distance_nm:2.24, fascia:"costa", difficulty:"facile", rating:4, isNew:true},
         {id:"drift-vada", name:"Drift Vada", type:"Drifting", typeKey:"drifting", lat:43.34, lon:10.38, depth:"15-28", fondale:"Sabbia", tecnica:"Drifting", description:"Deriva sabbia-roccia Vada.", zone:"Vada", distance_nm:3.85, fascia:"media", difficulty:"facile", rating:3, isNew:true},
-        {id:"spj-righini", name:"Righini SP", type:"Jigging", typeKey:"jigging", lat:43.393, lon:10.355, depth:"28-40", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"SPJ a metà strada dalla Cala.", zone:"Nord", distance_nm:3.12, fascia:"media", difficulty:"medio", rating:4, isNew:true},
-        {id:"sperone-esterno", name:"Sperone di Fuori", type:"Feature", typeKey:"varie", lat:43.305, lon:10.3, depth:"39-52", fondale:"Reef", tecnica:"Varie", description:"Reef parallelo costa — oltre 6 nm, meteo check.", zone:"Sud", distance_nm:7.7, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
-        {id:"marmi", name:"I Marmi", type:"Feature", typeKey:"varie", lat:43.285, lon:10.26, depth:"50-80", fondale:"Secca", tecnica:"Varie", description:"Rocce profonde — giornata lunga.", zone:"Sud", distance_nm:9.8, fascia:"largo", difficulty:"molto difficile", rating:5, isNew:false},
-        {id:"ciglio-cecina", name:"Ciglio di Cecina", type:"Feature", typeKey:"varie", lat:43.25, lon:10.3, depth:"30-55", fondale:"Ciglio", tecnica:"Varie", description:"Caduta netta a sud — solo con mare buono.", zone:"Sud", distance_nm:10.28, fascia:"largo", difficulty:"difficile", rating:5, isNew:false},
+        {id:"spj-righini", name:"Righini SP", type:"Slow Pitch", typeKey:"slowpitch", lat:43.393, lon:10.355, depth:"28-40", fondale:"Secca", tecnica:"Slow Pitch Jigging", description:"SPJ a metà strada dalla Cala.", zone:"Nord", distance_nm:3.12, fascia:"media", difficulty:"medio", rating:4, isNew:true},
+        {id:"sperone-esterno", name:"Sperone di Fuori", type:"Inchiku", typeKey:"inchiku", lat:43.305, lon:10.3, depth:"39-52", fondale:"Reef", tecnica:"Inchiku", description:"Reef parallelo costa — oltre 6 nm, meteo check.", zone:"Sud", distance_nm:7.7, fascia:"largo", difficulty:"difficile", rating:4, isNew:false},
+        {id:"marmi", name:"I Marmi", type:"Inchiku", typeKey:"inchiku", lat:43.285, lon:10.26, depth:"50-80", fondale:"Secca", tecnica:"Inchiku", description:"Rocce profonde — giornata lunga.", zone:"Sud", distance_nm:9.8, fascia:"largo", difficulty:"molto difficile", rating:5, isNew:false},
+        {id:"ciglio-cecina", name:"Ciglio di Cecina", type:"Inchiku", typeKey:"inchiku", lat:43.25, lon:10.3, depth:"30-55", fondale:"Ciglio", tecnica:"Inchiku", description:"Caduta netta a sud — solo con mare buono.", zone:"Sud", distance_nm:10.28, fascia:"largo", difficulty:"difficile", rating:5, isNew:false},
     ];
 
     // Distanze calcolate
@@ -1252,7 +1316,45 @@
     // MAP
     // ============================================================
     let map, markers = [], markerById = {}, depthLabelMarkers = [];
-    let activeFilters = {tenya:true, jigging:true, drifting:true, porto:true, varie:true, costa:true, media:true, largo:false, within6:true};
+    let activeFilters = {tenya:true, slowpitch:false, inchiku:false, drifting:false, spinning:false, porto:true, costa:true, media:true, largo:false, within6:true};
+    const TECH_FILTERS = ['tenya', 'slowpitch', 'inchiku', 'drifting', 'spinning'];
+    const ALL_SPOT_FILTERS = [...TECH_FILTERS, 'porto'];
+
+    function allSpotsOn() {
+        return ALL_SPOT_FILTERS.every((f) => !!activeFilters[f]);
+    }
+
+    function syncTuttiButton() {
+        const btn = document.getElementById('btnTuttiSpot');
+        if (!btn) return;
+        const on = allSpotsOn();
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.textContent = on ? '◎ Tutti ON' : '◎ Tutti gli spot';
+    }
+
+    function toggleAllSpots() {
+        const turnOn = !allSpotsOn();
+        ALL_SPOT_FILTERS.forEach((f) => {
+            activeFilters[f] = turnOn;
+            document.querySelector(`.filter-btn[data-filter="${f}"]`)?.classList.toggle('active', turnOn);
+        });
+        if (turnOn) {
+            // Mostra tutte le fasce e togli il tetto 6 nm
+            activeFilters.costa = true;
+            activeFilters.media = true;
+            activeFilters.largo = true;
+            activeFilters.within6 = false;
+            ['costa', 'media', 'largo'].forEach((f) => {
+                document.querySelector(`.filter-btn[data-filter="${f}"]`)?.classList.toggle('active', true);
+            });
+            document.querySelector('.filter-btn[data-filter="within6"]')?.classList.remove('active');
+        }
+        syncTuttiButton();
+        addMarkers();
+        showToast(turnOn ? 'Tutti gli spot ON' : 'Tutti gli spot OFF');
+    }
+    let listOltreOpen = false;
     let linee6nm, linee12nm, osmLayer, satelliteLayer, bathymetryLayer, contourLayer, openSeaMapLayer, coastLineLayer;
     let isobathLayer, isoLabelLayer, portRingsLayer = null, routeLayer = null;
     let soundingEnabled = true, soundingMarker = null;
@@ -1296,8 +1398,14 @@
         drawDistanceLines();
         drawVerifiedIsobaths();
         addMarkers();
+        map.on('zoomend', () => {
+            document.body.classList.toggle('zoom-labels', map.getZoom() >= 13);
+            addMarkers();
+        });
+        map.on('click', () => closeSpotSheet());
         renderSpotList();
         fillLegendSymbols();
+        syncTuttiButton();
         map.on('click', onMapSoundingClick);
         document.getElementById('btnSound')?.classList.add('sounding-on');
         publishNavGlobals();
@@ -1410,60 +1518,71 @@
     }
     
     function getMarkerColor(spot) {
-        if (spot.isNew) return '#8e44ad';
-        const c = {tenya:'#c0392b', jigging:'#6c3483', drifting:'#2471a3', porto:'#00b894', varie:'#5d6d7e'};
+        const c = {
+            tenya: '#c0392b',
+            slowpitch: '#6c3483',
+            inchiku: '#d35400',
+            drifting: '#2471a3',
+            spinning: '#16a085',
+            porto: '#00b894'
+        };
         return c[spot.typeKey] || '#5d6d7e';
     }
 
+    // Icona = tecnica (stessa forma su mappa, lista, filtri, legenda)
     function symbolKind(spot) {
-        const f = (spot.fondale || '').toLowerCase();
-        if (spot.id === BOAT_SPOT_ID || spot.boat) return 'boat';
-        if (f.includes('relitto')) return 'wreck';
-        if (f.includes('ciglio') || f.includes('canale') || f.includes('caduta')) return 'dropoff';
-        if (f.includes('scoglio')) return 'rock';
-        if (spot.typeKey === 'tenya') return 'tenya';
-        if (spot.typeKey === 'jigging') return 'jigging';
-        if (f.includes('secca') || f.includes('reef') || f.includes('rocci')) return 'shoal';
-        if ((spot.name || '').toLowerCase().includes('faro')) return 'lighthouse';
-        return 'shoal';
+        if (spot.id === BOAT_SPOT_ID || spot.boat) return 'porto';
+        return spot.typeKey || 'tenya';
     }
 
     function svgSymbol(kind, color) {
         const stroke = '#0b1d2a';
+        // TENYA — triangolo (testa tenya)
         if (kind === 'tenya') {
-            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><polygon points="14,4 24,24 4,24" fill="${color}" stroke="${stroke}" stroke-width="1.6"/><circle cx="14" cy="18" r="2" fill="#fff"/></svg>`;
+            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><polygon points="14,3 25,24 3,24" fill="${color}" stroke="${stroke}" stroke-width="1.6"/><circle cx="14" cy="17" r="2.4" fill="#fff"/></svg>`;
         }
-        if (kind === 'jigging') {
-            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="9" fill="${color}" stroke="${stroke}" stroke-width="1.6"/><circle cx="14" cy="14" r="4" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M14 3v5M14 20v5M3 14h5M20 14h5" stroke="#fff" stroke-width="1.5"/></svg>`;
+        // SLOW PITCH — cerchio + barre jig
+        if (kind === 'slowpitch') {
+            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="10" fill="${color}" stroke="${stroke}" stroke-width="1.6"/><rect x="12.2" y="6" width="3.6" height="16" rx="1.2" fill="#fff"/><path d="M8 10h12M8 14h12M8 18h12" stroke="#fff" stroke-width="1.2" opacity="0.85"/></svg>`;
         }
-        if (kind === 'wreck') {
-            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><path d="M4 18 L8 10 L20 10 L24 18 Z" fill="${color}" stroke="${stroke}" stroke-width="1.5"/><path d="M14 10 V5 M11 7 H17" stroke="${stroke}" stroke-width="1.6"/><path d="M6 18 Q14 23 22 18" fill="none" stroke="#fff" stroke-width="1.4"/></svg>`;
+        // INCHIKU — esagono kabura
+        if (kind === 'inchiku') {
+            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><polygon points="14,2 24,8 24,20 14,26 4,20 4,8" fill="${color}" stroke="${stroke}" stroke-width="1.6"/><circle cx="14" cy="14" r="3.2" fill="#fff"/><path d="M14 17v6M11 20h6" stroke="#fff" stroke-width="1.4"/></svg>`;
         }
-        if (kind === 'dropoff') {
-            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><path d="M4 8 H24 V12 L14 24 L4 12 Z" fill="${color}" stroke="${stroke}" stroke-width="1.5"/><path d="M8 12 H20" stroke="#fff" stroke-width="1.3"/></svg>`;
+        // DRIFTING — capsula orizzontale
+        if (kind === 'drifting') {
+            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="22" height="10" rx="5" fill="${color}" stroke="${stroke}" stroke-width="1.6"/><path d="M10 14h10" stroke="#fff" stroke-width="2"/><circle cx="8" cy="14" r="1.6" fill="#fff"/></svg>`;
         }
-        if (kind === 'rock') {
-            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><path d="M8 20 L11 9 L17 12 L20 8 L24 20 Z" fill="${color}" stroke="${stroke}" stroke-width="1.5"/><circle cx="14" cy="16" r="1.5" fill="#fff"/></svg>`;
+        // SPINNING — stella
+        if (kind === 'spinning') {
+            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><polygon points="14,2 17.2,10.2 26,10.5 19,15.8 21.5,24.5 14,19.8 6.5,24.5 9,15.8 2,10.5 10.8,10.2" fill="${color}" stroke="${stroke}" stroke-width="1.4"/><circle cx="14" cy="14" r="2" fill="#fff"/></svg>`;
         }
-        if (kind === 'lighthouse') {
-            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><rect x="11" y="10" width="6" height="12" fill="${color}" stroke="${stroke}" stroke-width="1.4"/><polygon points="14,3 18,10 10,10" fill="#f1c40f" stroke="${stroke}" stroke-width="1.2"/><path d="M8 22 H20" stroke="${stroke}" stroke-width="2"/></svg>`;
+        // PORTO
+        if (kind === 'porto') {
+            return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="11" fill="${color}" stroke="${stroke}" stroke-width="1.5"/><text x="14" y="18" text-anchor="middle" font-size="12" fill="#0a0a0f">⚓</text></svg>`;
         }
-        // shoal / default asterisk diamond
-        return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><polygon points="14,3 17,11 25,14 17,17 14,25 11,17 3,14 11,11" fill="${color}" stroke="${stroke}" stroke-width="1.4"/><circle cx="14" cy="14" r="2.2" fill="#fff"/></svg>`;
+        return `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="9" fill="${color}" stroke="${stroke}" stroke-width="1.5"/></svg>`;
     }
 
     function fillLegendSymbols() {
         const mapLeg = {
             legTenya: svgSymbol('tenya', '#c0392b'),
-            legJigging: svgSymbol('jigging', '#6c3483'),
-            legSecca: svgSymbol('shoal', '#5d6d7e'),
-            legRelitto: svgSymbol('wreck', '#7f8c8d'),
-            legCiglio: svgSymbol('dropoff', '#2980b9'),
-            legScoglio: svgSymbol('rock', '#a04000'),
+            legSlowpitch: svgSymbol('slowpitch', '#6c3483'),
+            legInchiku: svgSymbol('inchiku', '#d35400'),
+            legDrifting: svgSymbol('drifting', '#2471a3'),
+            legSpinning: svgSymbol('spinning', '#16a085'),
         };
-        Object.entries(mapLeg).forEach(([id, html]) => {
+        Object.entries(mapLeg).forEach(([id, htmlSym]) => {
             const el = document.getElementById(id);
-            if (el) el.innerHTML = html;
+            if (el) el.innerHTML = htmlSym;
+        });
+        const colors = {
+            tenya: '#c0392b', slowpitch: '#6c3483', inchiku: '#d35400',
+            drifting: '#2471a3', spinning: '#16a085', porto: '#00b894'
+        };
+        document.querySelectorAll('.flt-ico[data-sym]').forEach((el) => {
+            const k = el.dataset.sym;
+            el.innerHTML = svgSymbol(k, colors[k] || '#5d6d7e');
         });
     }
 
@@ -1579,10 +1698,11 @@
 
     function shouldShowSpot(spot) {
         if (spot.typeKey === 'tenya' && !activeFilters.tenya) return false;
-        if (spot.typeKey === 'jigging' && !activeFilters.jigging) return false;
+        if (spot.typeKey === 'slowpitch' && !activeFilters.slowpitch) return false;
+        if (spot.typeKey === 'inchiku' && !activeFilters.inchiku) return false;
         if (spot.typeKey === 'drifting' && !activeFilters.drifting) return false;
+        if (spot.typeKey === 'spinning' && !activeFilters.spinning) return false;
         if (spot.typeKey === 'porto' && !activeFilters.porto) return false;
-        if (spot.typeKey === 'varie' && !activeFilters.varie) return false;
         if (spot.fascia === 'costa' && !activeFilters.costa) return false;
         if (spot.fascia === 'media' && !activeFilters.media) return false;
         if (spot.fascia === 'largo' && !activeFilters.largo) return false;
@@ -1590,19 +1710,106 @@
         return true;
     }
     
+
+    function mapShouldShowMarker(spot) {
+        if (!shouldShowSpot(spot)) return false;
+        if (spot.id === BOAT_SPOT_ID || spot.boat) return true;
+        // Con Tutti ON: niente declutter, mostra ogni spot filtrato
+        if (allSpotsOn()) return true;
+        const z = map ? map.getZoom() : 12;
+        if (z >= 13) return true;
+        // Zoom medio/lontano: solo rating alto / new / piano / preferiti (via bridge class)
+        if (z >= 11 && (spot.rating >= 4 || spot.isNew)) return true;
+        if (window.LetiBridge && typeof LetiBridge.isHotSpot === 'function' && LetiBridge.isHotSpot(spot.id)) return true;
+        return z >= 13;
+    }
+
+    function openSpotSheet(spotOrId) {
+        const spot = typeof spotOrId === 'string' ? SPOTS.find(s => s.id === spotOrId) : spotOrId;
+        const sheet = document.getElementById('spotSheet');
+        const body = document.getElementById('spotSheetBody');
+        if (!spot || !sheet || !body) return;
+        body.innerHTML = createPopupContent(spot);
+        sheet.classList.add('open');
+        sheet.setAttribute('aria-hidden', 'false');
+        // chiudi sidebar su mobile per leggere la scheda
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            document.getElementById('sidebarPanel')?.classList.remove('visible');
+        }
+    }
+
+    function closeSpotSheet() {
+        const sheet = document.getElementById('spotSheet');
+        if (!sheet) return;
+        sheet.classList.remove('open');
+        sheet.setAttribute('aria-hidden', 'true');
+    }
+
+    function toggleListOltre() {
+        listOltreOpen = !listOltreOpen;
+        renderSpotList();
+    }
+
+    function techLabel(key) {
+        return ({
+            tenya: 'Tenya',
+            slowpitch: 'Slow Pitch',
+            inchiku: 'Inchiku',
+            drifting: 'Drifting',
+            spinning: 'Spinning',
+            porto: 'Porto'
+        })[key] || key;
+    }
+
+    function renderSpotGroup(spots) {
+        if (!spots.length) return '<div class="spot-list-empty">Nessuno spot con i filtri attuali</div>';
+        const byTech = {};
+        spots.forEach(s => {
+            const k = s.typeKey || 'tenya';
+            (byTech[k] = byTech[k] || []).push(s);
+        });
+        const order = ['porto', 'tenya', 'slowpitch', 'inchiku', 'drifting', 'spinning'];
+        const keys = order.filter(k => byTech[k]?.length).concat(Object.keys(byTech).filter(k => !order.includes(k)));
+        return keys.map(k => {
+            const items = byTech[k].map(spot => {
+                const color = spot.id === BOAT_SPOT_ID ? '#00b894' : getMarkerColor(spot);
+                const d = getSpotDistances(spot);
+                const range = spotRangeNm(spot);
+                const dist = spot.id === BOAT_SPOT_ID ? 'BASE' : `${range.toFixed(1)} nm`;
+                const meta = `${spot.tecnica} · ${spot.depth} m`;
+                const sym = spot.id === BOAT_SPOT_ID ? '' : svgSymbol(symbolKind(spot), color);
+                return `<button class="spot-list-item" onclick="focusSpot('${spot.id}')" type="button">
+                    <span class="legend-sym" style="width:18px;height:18px">${spot.id === BOAT_SPOT_ID ? '<span class="spot-list-dot" style="background:#00b894;display:inline-block"></span>' : sym}</span>
+                    <span>
+                        <div class="spot-list-name">${spot.id === BOAT_SPOT_ID ? 'LetiBlu — ' : ''}${spot.name}${spot.isNew ? ' NEW' : ''}</div>
+                        <div class="spot-list-meta">${meta}</div>
+                    </span>
+                    <span class="spot-list-dist">${dist}</span>
+                </button>`;
+            }).join('');
+            return `<div class="spot-list-tech">${techLabel(k)} · ${byTech[k].length}</div>${items}`;
+        }).join('');
+    }
+
     function addMarkers() {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
         markerById = {};
+        document.body.classList.toggle('zoom-labels', map && map.getZoom() >= 13);
         SPOTS.forEach(spot => {
-            const visible = shouldShowSpot(spot);
+            const visible = mapShouldShowMarker(spot);
+            if (!visible) return; // declutter: non disegnare spot nascosti
             const isBoat = spot.id === BOAT_SPOT_ID || !!spot.boat;
             const icon = isBoat ? createBoatIcon() : createTechnicalIcon(spot);
             const marker = L.marker([spot.lat, spot.lon], {
                 icon,
-                opacity: visible ? 1 : 0.2,
+                opacity: 1,
                 zIndexOffset: isBoat ? 1000 : 0
-            }).bindPopup(createPopupContent(spot), { maxWidth: 320 });
+            });
+            marker.on('click', (e) => {
+                L.DomEvent.stopPropagation(e);
+                openSpotSheet(spot);
+            });
             marker.addTo(map);
             markers.push(marker);
             markerById[spot.id] = marker;
@@ -1614,36 +1821,41 @@
     function renderSpotList() {
         const list = document.getElementById('spotList');
         if (!list) return;
-        const sorted = [...SPOTS].sort((a, b) => {
+        // Lista: ignora filtro within6 per poterle mostrare in due sezioni; rispetta tecnica/fascia
+        const techOk = (spot) => {
+            if (spot.typeKey === 'tenya' && !activeFilters.tenya) return false;
+            if (spot.typeKey === 'slowpitch' && !activeFilters.slowpitch) return false;
+            if (spot.typeKey === 'inchiku' && !activeFilters.inchiku) return false;
+            if (spot.typeKey === 'drifting' && !activeFilters.drifting) return false;
+            if (spot.typeKey === 'spinning' && !activeFilters.spinning) return false;
+            if (spot.typeKey === 'porto' && !activeFilters.porto) return false;
+            return true;
+        };
+        const sorted = [...SPOTS].filter(techOk).sort((a, b) => {
             if (a.id === BOAT_SPOT_ID) return -1;
             if (b.id === BOAT_SPOT_ID) return 1;
-            return (a.distance_nm || 0) - (b.distance_nm || 0);
+            return spotRangeNm(a) - spotRangeNm(b);
         });
-        list.innerHTML = sorted.filter(shouldShowSpot).map(spot => {
-            const color = spot.id === BOAT_SPOT_ID ? '#00b894' : getMarkerColor(spot);
-            const d = getSpotDistances(spot);
-            const range = spotRangeNm(spot);
-            const dist = spot.id === BOAT_SPOT_ID ? 'BASE' : `${range.toFixed(1)} nm`;
-            const meta = `${spot.tecnica} · ${spot.depth} m · costa ${d.costa.toFixed(1)} nm`;
-            const sym = spot.id === BOAT_SPOT_ID ? '' : svgSymbol(symbolKind(spot), color);
-            return `<button class="spot-list-item" onclick="focusSpot('${spot.id}')" type="button">
-                <span class="legend-sym" style="width:18px;height:18px">${spot.id === BOAT_SPOT_ID ? '<span class="spot-list-dot" style="background:#00b894;display:inline-block"></span>' : sym}</span>
-                <span>
-                    <div class="spot-list-name">${spot.id === BOAT_SPOT_ID ? 'LetiBlu — ' : ''}${spot.name}${spot.isNew ? ' NEW' : ''}</div>
-                    <div class="spot-list-meta">${meta}</div>
-                </span>
-                <span class="spot-list-dist">${dist}</span>
-            </button>`;
-        }).join('');
+        const within = sorted.filter(s => s.id === BOAT_SPOT_ID || spotRangeNm(s) <= 6.001);
+        const oltre = sorted.filter(s => s.id !== BOAT_SPOT_ID && spotRangeNm(s) > 6.001);
+        list.innerHTML = `
+            <div class="spot-list-section" onclick="/* sticky header */">⚓ Entro 6 nm <span>${within.length}</span></div>
+            ${renderSpotGroup(within)}
+            <div class="spot-list-section oltre" onclick="toggleListOltre()">🌊 Oltre 6 nm <span>${oltre.length} ${listOltreOpen ? '▲' : '▼'}</span></div>
+            ${listOltreOpen ? renderSpotGroup(oltre) : '<div class="spot-list-empty">Tocca per espandere gli spot al largo</div>'}
+        `;
     }
 
     function focusSpot(id) {
         const spot = SPOTS.find(s => s.id === id);
-        const marker = markerById[id];
-        if (!spot || !marker) return;
+        if (!spot) return;
         const zoom = id === BOAT_SPOT_ID ? 14 : 13;
         map.setView([spot.lat, spot.lon], zoom, { animate: true });
-        marker.openPopup();
+        // Assicura marker se era nascosto dal declutter zoom
+        setTimeout(() => {
+            if (!markerById[id] && mapShouldShowMarker(spot)) addMarkers();
+            openSpotSheet(spot);
+        }, 200);
         showToast(spot.id === BOAT_SPOT_ID ? 'Base barca LetiBlu' : spot.name);
     }
 
@@ -1656,24 +1868,42 @@
         const visible = markers.filter(m => m.options.opacity === 1).length;
         document.getElementById('spotCounterNum').textContent = `${visible}/${SPOTS.length}`;
         const counterLabel = document.getElementById('spotCounter');
-        if (counterLabel) counterLabel.textContent = `${SPOTS.length} spot · base LetiBlu`;
+        if (counterLabel) counterLabel.textContent = `${markers.length} in mappa · ${SPOTS.length} totali`;
     }
     
     function toggleFilter(btn) {
         const filter = btn.dataset.filter;
-        btn.classList.toggle('active');
-        activeFilters[filter] = btn.classList.contains('active');
+        if (filter === 'tutti') {
+            toggleAllSpots();
+            return;
+        }
+        if (TECH_FILTERS.includes(filter)) {
+            // Tecnica esclusiva: una sola attiva (+ porto resta indipendente)
+            TECH_FILTERS.forEach((f) => {
+                activeFilters[f] = (f === filter);
+                document.querySelector(`.filter-btn[data-filter="${f}"]`)?.classList.toggle('active', f === filter);
+            });
+            showToast('Tecnica: ' + techLabel(filter));
+        } else {
+            btn.classList.toggle('active');
+            activeFilters[filter] = btn.classList.contains('active');
+        }
+        syncTuttiButton();
         addMarkers();
     }
     
     function resetFilters() {
+        activeFilters = {tenya:true, slowpitch:false, inchiku:false, drifting:false, spinning:false, porto:true, costa:true, media:true, largo:false, within6:true};
         document.querySelectorAll('.filter-btn').forEach(b => {
             const f = b.dataset.filter;
-            b.classList.toggle('active', f !== 'largo');
+            if (f === 'tutti') return;
+            const on = !!activeFilters[f];
+            b.classList.toggle('active', on);
         });
-        activeFilters = {tenya:true, jigging:true, drifting:true, porto:true, varie:true, costa:true, media:true, largo:false, within6:true};
+        listOltreOpen = false;
+        syncTuttiButton();
         addMarkers();
-        showToast('Filtri resettati · entro 6 nm ON · largo OFF');
+        showToast('Reset · Tenya entro 6 nm');
     }
     
     function toggleLayer(layer) {

@@ -1,5 +1,5 @@
 /* LetiBlu Pesca Map — offline shell for boat use */
-const CACHE = 'letiblu-pesca-v3';
+const CACHE = 'letiblu-pesca-v4';
 const ASSETS = [
   './',
   './index.html',
