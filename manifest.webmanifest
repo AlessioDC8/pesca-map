@@ -1,0 +1,19 @@
+{
+  "name": "LetiBlu Pesca Map",
+  "short_name": "LetiBlu",
+  "description": "Navigazione pesca Castiglioncello/Vada — Simrad GO7 · Lowrance Elite 5 · Haswing 120lb",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1d2a",
+  "theme_color": "#00b894",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
